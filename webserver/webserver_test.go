@@ -25,7 +25,8 @@ func TestGenerateDataForAnyStruct(t *testing.T) {
 	t.Run("string struct", func(t *testing.T) {
 		// given
 		type StringStruct struct {
-			Name string
+			Name       string
+			WasAnderes int64
 		}
 		expectedAmount := 5
 
@@ -33,7 +34,8 @@ func TestGenerateDataForAnyStruct(t *testing.T) {
 		actual := generateTestData(expectedAmount, StringStruct{})
 
 		// then
-		expected := []StringStruct{{"foo"}, {"foo"}, {"foo"}, {"foo"}, {"foo"}}
+		expected := []StringStruct{{"foo", 0}, {"foo", 0}, {"foo", 0},
+			{"foo", 0}, {"foo", 0}}
 
 		assert.Len(t, expected, expectedAmount)
 		assert.Equal(t, expected, actual)

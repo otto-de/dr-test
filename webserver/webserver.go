@@ -30,27 +30,13 @@ type Foo struct{ Name string }
 
 func instantiate(dataType reflect.Type) interface{} {
 	obj := reflect.New(dataType).Elem()
-	fmt.Printf("NUMFIELDS %d\n", obj.NumField())
-
-	/*typ := reflect.StructOf([]reflect.StructField{
-		{
-			Name: "Height",
-			Type: reflect.TypeOf(float64(0)),
-		},
-		{
-			Name: "Name",
-			Type: reflect.TypeOf("abc"),
-		},
-	})*/
+	typeOf := obj.Type()
 
 	for i := 0; i < obj.NumField(); i++ {
 		field := obj.Field(i)
-		switch field.Type().Kind() {
-		case reflect.String:
-			fmt.Println(field.Type().Name())
-			/*fmt.Println(reflect.ValueOf(&obj).CanSet())
-			fmt.Println(reflect.ValueOf(reflect.ValueOf(obj).Field(i)).Elem())*/
-		}
+		fmt.Println("------")
+		fmt.Println(typeOf.Field(i).Name)
+		fmt.Println(field.Type().Name())
 	}
 	return obj.Interface()
 }
