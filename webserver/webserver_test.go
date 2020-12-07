@@ -7,18 +7,11 @@ import (
 
 // generateTestData(num, struct) => struct per reflection
 func TestGenerateTestDataFromStruct(t *testing.T) {
-	// given
-	// struct
 	expectedAmount := 10
-	got := generateTestData(expectedAmount, TestData{})
-	want := []TestData{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+	actual := generateTestData(expectedAmount, TestData{})
+	expected := []TestData{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
 
-	assert.Len(t, want, 10)
-	assert.Equal(t, want, got)
+	assert.Len(t, expected, expectedAmount)
+	assert.Equal(t, expected, actual)
 
-	// when
-	// getTestData()
-
-	// then
-	// n-Testdaten
 }
