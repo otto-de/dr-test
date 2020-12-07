@@ -21,7 +21,8 @@ func TestFieldsAndNames(t *testing.T) {
 		names := FieldsAndNames(NestedStruct{})
 
 		// then
-		assert.Equal(t, reflect.Struct, names.FieldByName["Foo"])
+		assert.Equal(t, reflect.Struct, names.FieldByName["Foo"], "should have a struct as child")
+		assert.Equal(t, reflect.String, names.Children["Foo"].FieldByName["Name"], "struct should have a child with name field")
 	})
 
 	t.Run("multiple fields", func(t *testing.T) {
