@@ -1,7 +1,6 @@
 package webserver
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -18,7 +17,13 @@ func TestMakeStruct(t *testing.T) {
 	}
 
 	makeStruct := MakeStruct(fields)
-	fmt.Printf("%v", makeStruct)
+
+	name, found := reflect.TypeOf(makeStruct).FieldByName("Name")
+	assert.True(t, found, "found field %s", name)
+
+	name2, found2 := reflect.TypeOf(makeStruct).FieldByName("GibtsNicht")
+	assert.False(t, found2, "no field field %s", name2)
+
 }
 
 func TestFieldsAndNames(t *testing.T) {

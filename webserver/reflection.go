@@ -32,6 +32,7 @@ func MakeStruct(fields Fields) interface{} {
 	structFields := []reflect.StructField{}
 
 	for n, _ := range fields.FieldByName {
+		fmt.Printf("Creating field %s", n)
 		structFields = append(structFields, reflect.StructField{Name: n, Type: reflect.TypeOf("foo")}) // todo Kind ist hier wohl nicht richtig
 	}
 	structType := reflect.StructOf(structFields)
