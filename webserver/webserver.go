@@ -30,14 +30,7 @@ type Foo struct{ Name string }
 
 func instantiate(dataType reflect.Type) interface{} {
 	obj := reflect.New(dataType).Elem()
-	typeOf := obj.Type()
 
-	for i := 0; i < obj.NumField(); i++ {
-		field := obj.Field(i)
-		fmt.Println("------")
-		fmt.Println(typeOf.Field(i).Name)
-		fmt.Println(field.Type().Name())
-	}
 	return obj.Interface()
 }
 
