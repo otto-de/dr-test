@@ -9,20 +9,30 @@ import (
 func TestFieldsAndNames(t *testing.T) {
 
 	t.Run("struct in struct", func(t *testing.T) {
+
+		type Embedded2 struct {
+			Number int64
+		}
+
 		type Embedded struct {
-			Name string
+			Name   string
+			Level1 Embedded2
 		}
 
 		type NestedStruct struct {
-			Foo Embedded
+			Level0 Embedded
 		}
 
 		// when
 		names := FieldsAndNames(NestedStruct{})
 
 		// then
-		assert.Equal(t, reflect.Struct, names.FieldByName["Foo"], "should have a struct as child")
-		assert.Equal(t, reflect.String, names.Children["Foo"].FieldByName["Name"], "struct should have a child with name field")
+
+		assert.Equal(t, reflect.Struct, names.FieldByName["Level0"])
+		assert.Equal(t, reflect.String, names.Children["Level0"].FieldByName["Name"])
+
+		assert.Equal(t, reflect.Struct, names.Children["Level0"].FieldByName["Level1"])
+		assert.Equal(t, reflect.Int64, names.Children["Level0"].Children["Level1"].FieldByName["Number"])
 	})
 
 	t.Run("multiple fields", func(t *testing.T) {
