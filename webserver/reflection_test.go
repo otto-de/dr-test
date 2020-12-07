@@ -21,7 +21,7 @@ func TestFieldsAndNames(t *testing.T) {
 		names := FieldsAndNames(NestedStruct{})
 
 		// then
-		assert.Equal(t, reflect.Struct, names["Foo"])
+		assert.Equal(t, reflect.Struct, names.FieldByName["Foo"])
 	})
 
 	t.Run("multiple fields", func(t *testing.T) {
@@ -37,10 +37,10 @@ func TestFieldsAndNames(t *testing.T) {
 		names := FieldsAndNames(TestStruct{})
 
 		// then
-		assert.Equal(t, reflect.String, names["Name"])
-		assert.Equal(t, reflect.Int64, names["Int"])
-		assert.Equal(t, reflect.Float64, names["Float"])
-		assert.Equal(t, reflect.Bool, names["Bool"])
+		assert.Equal(t, reflect.String, names.FieldByName["Name"])
+		assert.Equal(t, reflect.Int64, names.FieldByName["Int"])
+		assert.Equal(t, reflect.Float64, names.FieldByName["Float"])
+		assert.Equal(t, reflect.Bool, names.FieldByName["Bool"])
 	})
 
 }
