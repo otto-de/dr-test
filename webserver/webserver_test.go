@@ -7,27 +7,35 @@ import (
 
 // generateTestData(num, struct) => struct per reflection
 func TestGenerateDataForAnyStruct(t *testing.T) {
-
-	t.Run("struct a", func(t *testing.T) {
+	/*t.Run("empty struct", func(t *testing.T) {
+		// given
+		type EmptyStruct struct{}
 		expectedAmount := 10
-		actual := generateTestData(expectedAmount, TestStructA{})
-		expected := []TestStructA{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+
+		// when
+		actual := generateTestData(expectedAmount, EmptyStruct{})
+
+		// then
+		expected := []EmptyStruct{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+
+		assert.Len(t, expected, expectedAmount)
+		assert.Equal(t, expected, actual)
+	})*/
+
+	t.Run("string struct", func(t *testing.T) {
+		// given
+		type StringStruct struct {
+			Name string
+		}
+		expectedAmount := 5
+
+		// when
+		actual := generateTestData(expectedAmount, StringStruct{})
+
+		// then
+		expected := []StringStruct{{"foo"}, {"foo"}, {"foo"}, {"foo"}, {"foo"}}
 
 		assert.Len(t, expected, expectedAmount)
 		assert.Equal(t, expected, actual)
 	})
-	t.Run("struct b", func(t *testing.T) {
-		expectedAmount := 10
-		actual := generateTestData(expectedAmount, TestStructB{})
-		expected := []TestStructB{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
-
-		assert.Len(t, expected, expectedAmount)
-		assert.Equal(t, expected, actual)
-	})
-
-}
-
-type TestStructA struct {
-}
-type TestStructB struct {
 }
