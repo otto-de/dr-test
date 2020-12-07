@@ -10,16 +10,16 @@ func TestGenerateDataForAnyStruct(t *testing.T) {
 
 	t.Run("struct a", func(t *testing.T) {
 		expectedAmount := 10
-		actual := generateTestData(expectedAmount, TestData{})
-		expected := []TestData{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+		actual := generateTestData(expectedAmount, TestStructA{})
+		expected := []TestStructA{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
 
 		assert.Len(t, expected, expectedAmount)
 		assert.Equal(t, expected, actual)
 	})
 	t.Run("struct b", func(t *testing.T) {
 		expectedAmount := 10
-		actual := generateTestData(expectedAmount, TestData{})
-		expected := []TestData{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
+		actual := generateTestData(expectedAmount, TestStructB{})
+		expected := []TestStructB{{}, {}, {}, {}, {}, {}, {}, {}, {}, {}}
 
 		assert.Len(t, expected, expectedAmount)
 		assert.Equal(t, expected, actual)

@@ -1,8 +1,8 @@
 package webserver
 
-func generateTestData(amount int, data TestData) []TestData {
-	return []TestData{}
-}
+import "fmt"
 
-type TestData struct {
+func generateTestData(amount int, data interface{}) []interface{} {
+	fmt.Printf("Got %d", data)
+	return []interface{}{}
 }
