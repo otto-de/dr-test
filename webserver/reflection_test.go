@@ -1,10 +1,25 @@
 package webserver
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 )
+
+func TestMakeStruct(t *testing.T) {
+
+	m := make(map[string]reflect.Kind)
+	m["Name"] = reflect.String
+
+	fields := Fields{
+		FieldByName: m,
+		Children:    nil,
+	}
+
+	makeStruct := MakeStruct(fields)
+	fmt.Printf("%v", makeStruct)
+}
 
 func TestFieldsAndNames(t *testing.T) {
 

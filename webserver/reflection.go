@@ -28,6 +28,21 @@ func FieldsAndNames(data interface{}) Fields {
 	return Fields{m, children}
 }
 
+func MakeStruct(fields Fields) interface{} {
+	structFields := []reflect.StructField{}
+
+	for n, _ := range fields.FieldByName {
+		structFields = append(structFields, reflect.StructField{Name: n, Type: reflect.TypeOf("foo")}) // todo Kind ist hier wohl nicht richtig
+	}
+	structType := reflect.StructOf(structFields)
+
+	created := reflect.New(structType)
+	created.Elem().FieldByName("Name").SetString("der name")
+
+	return created
+
+}
+
 type Fields struct {
 	FieldByName map[string]reflect.Kind
 	Children    map[string]Fields
