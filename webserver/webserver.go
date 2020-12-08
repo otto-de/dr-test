@@ -1,46 +1,46 @@
 package webserver
 
 import (
+	"encoding/json"
 	"fmt"
-	"reflect"
-	"unsafe"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
+	"strconv"
 )
 
-type Test struct {
-	name string
-	age  int
-}
+func getHandler(structName string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		type DemoStruct struct {
+			Name string
+		}
 
-func testt() {
+		fmt.Println("STRUCTNAME", structName)
 
-	foo := Test{"ima", 2}
+		response, err := json.Marshal(DemoStruct{structName})
 
-	fmt.Println(string(reflect.ValueOf(foo).Field(0).String()))
+		if err != nil {
+			fmt.Println("MARSHAL ERROR", err)
+		}
 
-	field := reflect.ValueOf(&foo).Elem().FieldByName("name")
+		_, writeErr := w.Write(response)
 
-	reflect.NewAt(field.Type(), unsafe.Pointer(field.UnsafeAddr())).
-		Elem().
-		Set(reflect.ValueOf("new Value"))
-
-	fmt.Println(string(reflect.ValueOf(foo).Field(0).String()))
-}
-
-type Foo struct{ Name string }
-
-func instantiate(dataType reflect.Type) interface{} {
-	obj := reflect.New(dataType).Elem()
-
-	return obj.Interface()
-}
-
-func generateTestData(amount int, data interface{}) interface{} {
-	dataType := reflect.TypeOf(data)
-	var slice = make([]interface{}, amount)
-	//slice[0] = reflect.New(dataType).Interface()
-	for i, _ := range slice {
-		slice[i] = instantiate(dataType)
+		if writeErr != nil {
+			fmt.Println("WRITE ERROR", writeErr)
+		}
 	}
+}
 
-	return slice
+func populateRouter(router *mux.Router, structNames []string) {
+	for _, structName := range structNames {
+		router.HandleFunc("/" + structName, getHandler(structName)).Methods("GET")
+	}
+}
+
+func StartServer(host string, port int) {
+	r := mux.NewRouter()
+	populateRouter(r, []string{"person"})
+	addr := host + ":" + strconv.Itoa(port)
+	fmt.Println("Starting server on " + addr)
+	log.Fatal(http.ListenAndServe(addr, r))
 }
