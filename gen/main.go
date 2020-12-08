@@ -12,7 +12,11 @@ import (
 )
 
 func main() {
-	fmt.Println(filepath.Abs(filepath.Dir(os.Args[0]) + "../generated"))
+	generatedDirName, err := filepath.Abs("../generated")
+	if err != nil {
+		log.Panic(err)
+	}
+
 	schemaFile, err := os.Open("../schema.avsc")
 	if err != nil {
 		log.Panic(err)
@@ -25,22 +29,47 @@ func main() {
 
 	fmt.Printf("TopLevel: %s\n", name)
 
-	//err = cleanDirectory(generatedDirName)
-	//if err != nil {
-	//
-	//}
+	err = cleanDirectory(generatedDirName)
+	if err != nil {
+		log.Panic(err)
+	}
 
-	generateFunction(name)
+	lowerCasedEntity := strings.ToLower(name)
 
-	generateGeneratorMap(name)
+	code := generateGeneratorMap(name)
+	err = writeFile("generator", code, generatedDirName)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	code = generateFunction(name)
+	err = writeFile(lowerCasedEntity, code, generatedDirName + "/" + lowerCasedEntity)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	avroTargetDir := generatedDirName + "/" + lowerCasedEntity + "/avro"
+	err = os.MkdirAll(avroTargetDir, 0755)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = GenerateAvro([]string{"../schema.avsc"}, avroTargetDir)
+	if err != nil {
+		log.Panic(err)
+	}
 }
 
-func cleanDirectory(dirToClean string) error {
-	err := os.RemoveAll(dirToClean)
+func writeFile(fileName string, content string, parentDir string) error {
+	err := os.Mkdir(parentDir, 0755)
 	if err != nil {
 		return err
 	}
-	return os.Mkdir(dirToClean, os.ModeDir)
+	return ioutil.WriteFile(parentDir + "/" + fileName + ".go", []byte(content), 0644)
+}
+
+func cleanDirectory(dirToClean string) error {
+	return os.RemoveAll(dirToClean)
 }
 
 func loadTopLevelEntityNameFromSchema(schema *os.File) (string, error) {
@@ -57,20 +86,21 @@ func loadTopLevelEntityNameFromSchema(schema *os.File) (string, error) {
 	return m["name"].(string), nil
 }
 
-func generateFunction(entity string) {
+func generateFunction(entity string) string {
 	upperCasedEntity := strings.Title(entity)
 	lowerCasedEntity := strings.ToLower(entity)
+	packageName := fmt.Sprintf("drtest/generated/%s/avro", lowerCasedEntity)
 
 	f := NewFile(lowerCasedEntity)
-	f.ImportName("avro", "avro")
+	f.ImportName(packageName, "avro")
 	f.Func().
-		Id(fmt.Sprintf("generate%s", upperCasedEntity)).Params(Id("amount").Int()).Index().Interface().
+		Id(fmt.Sprintf("Generate%s", upperCasedEntity)).Params(Id("amount").Int()).Index().Interface().
 		Block(
 			Id("sliced").Op(":=").Make(Index().Interface(), Id("amount")),
 			For(
 				Id("i").Op(":=").Range().Id("sliced")).
 				Block(Id("sliced").Index(Id("i")).Op("=").
-					Id("randomize").Params(Qual("avro", fmt.Sprintf("New%s", upperCasedEntity)).Call())),
+					Id("randomize").Params(Qual(packageName, fmt.Sprintf("New%s", upperCasedEntity)).Call())),
 			Return(Id("sliced")),
 		)
 
@@ -79,10 +109,10 @@ func generateFunction(entity string) {
 			Return(Id(lowerCasedEntity)),
 		)
 
-	fmt.Printf("%#v", f)
+	return fmt.Sprintf("%#v", f)
 }
 
-func generateGeneratorMap(entity string) {
+func generateGeneratorMap(entity string) string {
 	upperCasedEntity := strings.Title(entity)
 	lowerCasedEntity := strings.ToLower(entity)
 	f := NewFile("generated")
@@ -105,5 +135,5 @@ func generateGeneratorMap(entity string) {
 			),
 		)
 
-	fmt.Printf("%#v", f)
+	return fmt.Sprintf("%#v", f)
 }
