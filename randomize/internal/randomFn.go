@@ -7,8 +7,8 @@ import (
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func randomString() string {
-	b := make([]byte, 1+rand.Int31n(100))
+func randomString(maxLength int) string {
+	b := make([]byte, 1+rand.Intn(maxLength))
 	for i := range b {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
@@ -32,7 +32,7 @@ func randomBool() bool {
 }
 
 func randomSlice(sliceType reflect.Type, size int) reflect.Value {
-	slice := reflect.MakeSlice(reflect.SliceOf(sliceType), 0, size)
+	slice := reflect.MakeSlice(reflect.SliceOf(sliceType), 0, 5)
 	for i := 0; i < size; i++ {
 		slice = reflect.Append(slice, reflect.ValueOf(randomSimpleValue(sliceType)))
 	}
@@ -42,7 +42,7 @@ func randomSlice(sliceType reflect.Type, size int) reflect.Value {
 func randomSimpleValue(typ reflect.Type) interface{} {
 	switch typ.Kind() {
 	case reflect.String:
-		return randomString()
+		return randomString(10)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return randomInt()
 	case reflect.Float32, reflect.Float64:
