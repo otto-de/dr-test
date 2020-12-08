@@ -9,7 +9,7 @@ import (
 
 func TestRandomize(t *testing.T) {
 
-	randomized := randomize(&Person{}, internal.Configuration{
+	randomized := Randomize(&Person{}, internal.Configuration{
 		MaxListSize:     4,
 		MaxStringLength: 5,
 	})
