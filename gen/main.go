@@ -90,9 +90,11 @@ func generateFunction(entity string) string {
 	upperCasedEntity := strings.Title(entity)
 	lowerCasedEntity := strings.ToLower(entity)
 	packageName := fmt.Sprintf("drtest/generated/%s/avro", lowerCasedEntity)
+	apiPackageName := fmt.Sprintf("drtest/randomize/api")
 
 	f := NewFile(lowerCasedEntity)
 	f.ImportName(packageName, "avro")
+	f.ImportName(apiPackageName, "api")
 	f.Func().
 		Id(fmt.Sprintf("Generate%s", upperCasedEntity)).Params(Id("amount").Int()).Index().Interface().
 		Block(
@@ -106,7 +108,7 @@ func generateFunction(entity string) string {
 
 	f.Func().Id("randomize").Params(Id(lowerCasedEntity).Interface()).Interface().
 		Block(
-			Return(Id(lowerCasedEntity)),
+			Return(Qual(apiPackageName,"RandomizeWithDefaults").Call(Id(lowerCasedEntity))),
 		)
 
 	return fmt.Sprintf("%#v", f)
