@@ -15,3 +15,5 @@
 # vendor/
 .idea/
 **/go.sum
+
+generated/
