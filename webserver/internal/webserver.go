@@ -12,14 +12,18 @@ import (
 	"strings"
 )
 
-func generate(structName string, amount int) *[]interface{} {
-	return generated.Generate(structName)(amount)
+func generate(structName string, amount int) []interface{} {
+	strukt, err := generated.Generate(structName, amount)
+
+	if err != nil {
+		return strukt
+	}
+
+	panic(err)
 }
 
 func getHandler(structName string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("STRUCTNAME", structName)
-
 		amount := 10 // TODO: use quantity from path var
 		response, err := json.Marshal(generate(structName, amount))
 
@@ -39,7 +43,7 @@ func populateRouter(router *mux.Router, structNames []string) {
 	for _, structName := range structNames {
 		lowercased := strings.ToLower(structName)
 		fmt.Println("Populating /" + lowercased)
-		router.HandleFunc("/" + lowercased + "/{quantity}", getHandler(structName)).Methods("GET")
+		router.HandleFunc("/"+lowercased, getHandler(structName)).Methods("GET")
 	}
 }
 
