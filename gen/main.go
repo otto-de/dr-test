@@ -7,10 +7,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
 func main() {
+	fmt.Println(filepath.Abs(filepath.Dir(os.Args[0]) + "../generated"))
 	schemaFile, err := os.Open("../schema.avsc")
 	if err != nil {
 		log.Panic(err)
@@ -22,9 +24,23 @@ func main() {
 	}
 
 	fmt.Printf("TopLevel: %s\n", name)
+
+	//err = cleanDirectory(generatedDirName)
+	//if err != nil {
+	//
+	//}
+
 	generateFunction(name)
 
 	generateGeneratorMap(name)
+}
+
+func cleanDirectory(dirToClean string) error {
+	err := os.RemoveAll(dirToClean)
+	if err != nil {
+		return err
+	}
+	return os.Mkdir(dirToClean, os.ModeDir)
 }
 
 func loadTopLevelEntityNameFromSchema(schema *os.File) (string, error) {
