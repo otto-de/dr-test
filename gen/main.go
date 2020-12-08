@@ -23,6 +23,8 @@ func main() {
 
 	fmt.Printf("TopLevel: %s\n", name)
 	generateFunction(name)
+
+	generateGeneratorMap(name)
 }
 
 func loadTopLevelEntityNameFromSchema(schema *os.File) (string, error) {
@@ -59,6 +61,32 @@ func generateFunction(entity string) {
 	f.Func().Id("randomize").Params(Id(lowerCasedEntity).Interface()).Interface().
 		Block(
 			Return(Id(lowerCasedEntity)),
+		)
+
+	fmt.Printf("%#v", f)
+}
+
+func generateGeneratorMap(entity string) {
+	upperCasedEntity := strings.Title(entity)
+	lowerCasedEntity := strings.ToLower(entity)
+	f := NewFile("generated")
+	f.ImportName(fmt.Sprintf("drtest/generated/%s", lowerCasedEntity), lowerCasedEntity)
+	f.ImportName("errors", "errors")
+
+	f.Func().Id("Generate").Params(
+		Id("structName").String(),
+		Id("amount").Int()).
+		Call(Index().Interface(), Id("error")).
+		Block(
+			Switch(Id("structName").
+				Block(
+					Case(Lit(lowerCasedEntity)).
+						Block(
+							Return(Qual(fmt.Sprintf("drtest/generated/%s", lowerCasedEntity), fmt.Sprintf("Generate%s", upperCasedEntity)).Call(Id("amount")), Nil()),
+						),
+					Default().Block(
+						Return(Nil(), Qual("errors", "New").Call(Lit("struct not found"))))),
+			),
 		)
 
 	fmt.Printf("%#v", f)
