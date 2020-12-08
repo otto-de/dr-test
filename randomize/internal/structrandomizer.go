@@ -14,7 +14,7 @@ func Randomize(strukt interface{}) interface{} {
 	return strukt
 }
 
-func setValue(strukt interface{}, fieldMeta FieldMeta) {
+func setValue(strukt interface{}, fieldMeta fieldMeta) {
 	elem := reflect.ValueOf(strukt).Elem()
 	f := elem.FieldByName(fieldMeta.Name)
 	if f.CanSet() {
@@ -24,13 +24,9 @@ func setValue(strukt interface{}, fieldMeta FieldMeta) {
 	}
 }
 
-func setRandomValue(struktField reflect.Value, fieldMeta FieldMeta) {
+func setRandomValue(struktField reflect.Value, fieldMeta fieldMeta) {
 	switch fieldMeta.Kind {
 	case reflect.String:
 		struktField.SetString(randomString())
 	}
-}
-
-func randomString() string {
-	return "foo"
 }

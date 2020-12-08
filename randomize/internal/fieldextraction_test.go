@@ -16,11 +16,11 @@ func TestFindFields(t *testing.T) {
 
 		got := getFieldMeta(&StringStruct{})
 		assert.Len(t, got, 2)
-		assert.Equal(t, got[0], FieldMeta{
+		assert.Equal(t, got[0], fieldMeta{
 			Name: "String1",
 			Kind: reflect.String,
 		})
-		assert.Equal(t, got[1], FieldMeta{
+		assert.Equal(t, got[1], fieldMeta{
 			Name: "String2",
 			Kind: reflect.String,
 		})
@@ -38,11 +38,11 @@ func TestFindFields(t *testing.T) {
 
 		got := getFieldMeta(&IntStruct{})
 		assert.Len(t, got, 5)
-		assert.Contains(t, got, FieldMeta{Name: "Int1", Kind: reflect.Int})
-		assert.Contains(t, got, FieldMeta{Name: "Int2", Kind: reflect.Int8})
-		assert.Contains(t, got, FieldMeta{Name: "Int3", Kind: reflect.Int16})
-		assert.Contains(t, got, FieldMeta{Name: "Int4", Kind: reflect.Int32})
-		assert.Contains(t, got, FieldMeta{Name: "Int5", Kind: reflect.Int64})
+		assert.Contains(t, got, fieldMeta{Name: "Int1", Kind: reflect.Int})
+		assert.Contains(t, got, fieldMeta{Name: "Int2", Kind: reflect.Int8})
+		assert.Contains(t, got, fieldMeta{Name: "Int3", Kind: reflect.Int16})
+		assert.Contains(t, got, fieldMeta{Name: "Int4", Kind: reflect.Int32})
+		assert.Contains(t, got, fieldMeta{Name: "Int5", Kind: reflect.Int64})
 
 	})
 
@@ -54,8 +54,8 @@ func TestFindFields(t *testing.T) {
 
 		got := getFieldMeta(&FloatStruct{})
 		assert.Len(t, got, 2)
-		assert.Contains(t, got, FieldMeta{Name: "Float1", Kind: reflect.Float32})
-		assert.Contains(t, got, FieldMeta{Name: "Float2", Kind: reflect.Float64})
+		assert.Contains(t, got, fieldMeta{Name: "Float1", Kind: reflect.Float32})
+		assert.Contains(t, got, fieldMeta{Name: "Float2", Kind: reflect.Float64})
 
 	})
 
@@ -66,7 +66,7 @@ func TestFindFields(t *testing.T) {
 
 		got := getFieldMeta(&BooleanStruct{})
 		assert.Len(t, got, 1)
-		assert.Contains(t, got, FieldMeta{Name: "Boolean", Kind: reflect.Bool})
+		assert.Contains(t, got, fieldMeta{Name: "Boolean", Kind: reflect.Bool})
 	})
 
 	t.Run("find struct fields", func(t *testing.T) {
@@ -79,7 +79,7 @@ func TestFindFields(t *testing.T) {
 
 		got := getFieldMeta(&StructStruct{})
 		assert.Len(t, got, 1)
-		assert.Contains(t, got, FieldMeta{Name: "Struct", Kind: reflect.Struct})
+		assert.Contains(t, got, fieldMeta{Name: "Struct", Kind: reflect.Struct})
 	})
 
 	t.Run("find slice fields", func(t *testing.T) {
@@ -89,7 +89,7 @@ func TestFindFields(t *testing.T) {
 
 		got := getFieldMeta(&SliceStruct{})
 		assert.Len(t, got, 1)
-		assert.Contains(t, got, FieldMeta{Name: "Slice", Kind: reflect.Slice})
+		assert.Contains(t, got, fieldMeta{Name: "Slice", Kind: reflect.Slice})
 	})
 
 	t.Run("find mixed fields", func(t *testing.T) {
@@ -101,9 +101,9 @@ func TestFindFields(t *testing.T) {
 
 		got := getFieldMeta(&MixedStruct{})
 		assert.Len(t, got, 3)
-		assert.Contains(t, got, FieldMeta{Name: "Slice", Kind: reflect.Slice})
-		assert.Contains(t, got, FieldMeta{Name: "String", Kind: reflect.String})
-		assert.Contains(t, got, FieldMeta{Name: "Int", Kind: reflect.Int})
+		assert.Contains(t, got, fieldMeta{Name: "Slice", Kind: reflect.Slice})
+		assert.Contains(t, got, fieldMeta{Name: "String", Kind: reflect.String})
+		assert.Contains(t, got, fieldMeta{Name: "Int", Kind: reflect.Int})
 	})
 
 }
