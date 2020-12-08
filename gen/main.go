@@ -126,7 +126,7 @@ func generateGeneratorMap(entity string) string {
 		Block(
 			Switch(Id("structName").
 				Block(
-					Case(Lit(lowerCasedEntity)).
+					Case(Lit(upperCasedEntity)).
 						Block(
 							Return(Qual(fmt.Sprintf("drtest/generated/%s", lowerCasedEntity), fmt.Sprintf("Generate%s", upperCasedEntity)).Call(Id("amount")), Nil()),
 						),
