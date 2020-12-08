@@ -1,6 +1,7 @@
-package internal
+package webserver
 
 import (
+	"drtest/generated"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -11,12 +12,9 @@ import (
 	"strings"
 )
 
-type Foo struct{Name string}
-func generate(structName string, amount int) *[]Foo {
-	return &[]Foo{{"foo"}, {"bar"}}
+func generate(structName string, amount int) *[]interface{} {
+	return generated.Generate(structName)(amount)
 }
-
-type generateFn = func(amount int) []interface{}
 
 func getHandler(structName string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
