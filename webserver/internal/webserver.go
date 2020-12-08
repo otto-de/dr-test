@@ -8,24 +8,32 @@ import (
 	"github.com/thedevsaddam/gojsonq"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
 
-func generate(structName string, amount int) []interface{} {
+func generate(structName string, amount int) ([]interface{}, error) {
 	strukt, err := generated.Generate(structName, amount)
 
 	if err != nil {
-		return strukt
+		return nil, err
 	}
 
-	panic(err)
+	return strukt, nil
 }
 
 func getHandler(structName string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		amount := 10 // TODO: use quantity from path var
-		response, err := json.Marshal(generate(structName, amount))
+		amount := 1 // TODO: use quantity from path var
+		entities, err := generate(structName, amount)
+
+		if err != nil {
+			fmt.Println("ERROR generating:", err)
+			os.Exit(1)
+		}
+
+		response, err := json.Marshal(entities)
 
 		if err != nil {
 			fmt.Println("MARSHAL ERROR", err)
