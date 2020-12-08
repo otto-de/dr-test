@@ -7,20 +7,33 @@ import (
 
 func Randomize(strukt interface{}) interface{} {
 	fields := getFieldMeta(strukt)
+	fmt.Printf("Fields to fill: %v\n", fields)
 	for _, m := range fields {
-		setValue(strukt, m)
+		if m.Kind == reflect.Struct {
+			fillNestedStruct(strukt, m)
+		} else {
+			fillSimpleValue(strukt, m)
+		}
 	}
-	fmt.Printf("Created struct %+v\n", strukt)
+	fmt.Printf("Created struct\n%+v\n", strukt)
 	return strukt
 }
 
-func setValue(strukt interface{}, fieldMeta fieldMeta) {
+func fillNestedStruct(strukt interface{}, m fieldMeta) {
+	elem := reflect.ValueOf(strukt).Elem()
+	field := (&elem).FieldByName(m.Name)
+	nestedStruct := reflect.New(field.Type())
+	Randomize(nestedStruct.Interface())
+	fmt.Printf("Nested struct\n%+v\n", nestedStruct)
+	field.Set(nestedStruct.Elem())
+}
+
+func fillSimpleValue(strukt interface{}, fieldMeta fieldMeta) {
 	elem := reflect.ValueOf(strukt).Elem()
 	f := elem.FieldByName(fieldMeta.Name)
+
 	if f.CanSet() {
 		setRandomValue(f, fieldMeta)
-	} else {
-		fmt.Printf("Cannot set field %q", fieldMeta)
 	}
 }
 
@@ -39,5 +52,6 @@ func setRandomValue(struktField reflect.Value, fieldMeta fieldMeta) {
 		size := randomIntCapped(100)
 		slice := randomSlice(sliceType, size)
 		struktField.Set(slice.Slice(0, size))
+
 	}
 }

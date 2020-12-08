@@ -83,6 +83,31 @@ func TestRandomizeSlices(t *testing.T) {
 	assert.NotEmpty(t, getField(got, "SliceBool").Slice(0, 1))
 }
 
+func TestNestedStructs(t *testing.T) {
+
+	type InnerStruct struct {
+		Int       int64
+		InnerName string
+	}
+
+	type MiddleStruct struct {
+		MiddleName  string
+		InnerStruct InnerStruct
+	}
+
+	type OuterStruct struct {
+		OuterName    string
+		MiddleStruct MiddleStruct
+	}
+
+	got := Randomize(&OuterStruct{})
+	assert.NotNil(t, got)
+	assert.True(t, len(getField(got, "OuterName").String()) > 0)
+	assert.True(t, len(getField(got, "MiddleStruct").FieldByName("MiddleName").String()) > 0)
+	assert.True(t, len(getField(got, "MiddleStruct").FieldByName("InnerStruct").FieldByName("InnerName").String()) > 0)
+
+}
+
 func getField(strukt interface{}, name string) reflect.Value {
 	elem := reflect.ValueOf(strukt).Elem()
 	return elem.FieldByName(name)
