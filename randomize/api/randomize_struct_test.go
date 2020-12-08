@@ -29,15 +29,15 @@ type Coordinates struct {
 }
 
 type Person struct {
-	FirstName    string
-	LastName     string
-	Hobbies      []string
-	LuckyNumbers []int64
-	Cool         bool
-	Balance      float64
-	Coordinates  Coordinates
-	Pets         []Pet
-	BFF          []Person
+	FirstName         string
+	LastName          string
+	Hobbies           []string
+	LuckyNumbers      []int64
+	Cool              bool
+	Balance           float64
+	Coordinates       Coordinates
+	Pets              []Pet
+	SuperBesteFreunde []Person
 }
 
 func (p Person) String() string {
