@@ -12,6 +12,7 @@ func TestRandomizeSimpleValues(t *testing.T) {
 			String string
 		}
 		got := randomize(StringStruct{})
+		assert.NotNil(t, got)
 	})
 
 	t.Run("randomize integer", func(t *testing.T) {
