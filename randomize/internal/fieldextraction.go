@@ -6,14 +6,14 @@ import (
 )
 
 func getFieldMeta(strukt interface{}) []fieldMeta {
-	fields := []fieldMeta{}
+	var fields []fieldMeta
 	elem := reflect.ValueOf(strukt).Elem()
 	elemT := reflect.TypeOf(strukt).Elem()
 
 	for i := 0; i < elem.NumField(); i++ {
-		//field := elem.fieldMeta(i)
 		fieldT := elemT.Field(i)
-		fields = append(fields, fieldMeta{fieldT.Name, fieldT.Type.Kind()})
+		val := elem.Field(i)
+		fields = append(fields, fieldMeta{fieldT.Name, fieldT.Type.Kind(), val})
 
 	}
 
@@ -21,8 +21,9 @@ func getFieldMeta(strukt interface{}) []fieldMeta {
 }
 
 type fieldMeta struct {
-	Name string
-	Kind reflect.Kind
+	Name  string
+	Kind  reflect.Kind
+	Value reflect.Value
 }
 
 func (f fieldMeta) String() string {

@@ -34,6 +34,10 @@ func setRandomValue(struktField reflect.Value, fieldMeta fieldMeta) {
 		struktField.SetFloat(randomFloat())
 	case reflect.Bool:
 		struktField.SetBool(randomBool())
-
+	case reflect.Slice:
+		sliceType := reflect.TypeOf(fieldMeta.Value.Interface()).Elem()
+		size := randomIntCapped(100)
+		slice := randomSlice(sliceType, size)
+		struktField.Set(slice.Slice(0, size))
 	}
 }

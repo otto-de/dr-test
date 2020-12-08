@@ -65,6 +65,24 @@ func TestRandomizeSimpleValues(t *testing.T) {
 
 }
 
+func TestRandomizeSlices(t *testing.T) {
+	type StructWithSlice struct {
+		String       string
+		Slice        []string
+		SliceInt64   []int64
+		SliceFloat64 []float64
+		SliceBool    []bool
+	}
+
+	got := Randomize(&StructWithSlice{})
+	assert.NotNil(t, got)
+	assert.True(t, len(getField(got, "String").String()) > 0)
+	assert.NotEmpty(t, getField(got, "Slice").Slice(0, 1))
+	assert.NotEmpty(t, getField(got, "SliceInt64").Slice(0, 1))
+	assert.NotEmpty(t, getField(got, "SliceFloat64").Slice(0, 1))
+	assert.NotEmpty(t, getField(got, "SliceBool").Slice(0, 1))
+}
+
 func getField(strukt interface{}, name string) reflect.Value {
 	elem := reflect.ValueOf(strukt).Elem()
 	return elem.FieldByName(name)
