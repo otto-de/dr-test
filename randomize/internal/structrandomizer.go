@@ -10,7 +10,7 @@ func Randomize(strukt interface{}) interface{} {
 	for _, m := range fields {
 		setValue(strukt, m)
 	}
-	fmt.Printf("Created struct %+v", strukt)
+	fmt.Printf("Created struct %+v\n", strukt)
 	return strukt
 }
 
@@ -28,5 +28,12 @@ func setRandomValue(struktField reflect.Value, fieldMeta fieldMeta) {
 	switch fieldMeta.Kind {
 	case reflect.String:
 		struktField.SetString(randomString())
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		struktField.SetInt(randomInt())
+	case reflect.Float32, reflect.Float64:
+		struktField.SetFloat(randomFloat())
+	case reflect.Bool:
+		struktField.SetBool(randomBool())
+
 	}
 }
