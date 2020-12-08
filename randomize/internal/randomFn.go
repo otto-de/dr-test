@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"math/rand"
 	"reflect"
 )
@@ -32,7 +33,10 @@ func randomBool() bool {
 }
 
 func randomSlice(sliceType reflect.Type, size int) reflect.Value {
-	slice := reflect.MakeSlice(reflect.SliceOf(sliceType), 0, 5)
+	sliceOfType := reflect.SliceOf(sliceType)
+	fmt.Printf("Slice type %v", sliceOfType)
+	slice := reflect.MakeSlice(sliceOfType, 0, 5)
+	fmt.Printf("Created slice %v", slice)
 	for i := 0; i < size; i++ {
 		slice = reflect.Append(slice, reflect.ValueOf(randomSimpleValue(sliceType)))
 	}
@@ -50,6 +54,15 @@ func randomSimpleValue(typ reflect.Type) interface{} {
 	case reflect.Bool:
 		return randomBool()
 	default:
-		return nil
+
+		nestedStruct := reflect.New(typ)
+		fmt.Printf("Nested struct\n%+v\n", nestedStruct)
+		Randomize(nestedStruct.Interface(), Configuration{
+			MaxListSize:     3,
+			MaxStringLength: 10,
+		})
+
+		return nestedStruct.Elem().Interface()
+
 	}
 }

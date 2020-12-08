@@ -1,22 +1,31 @@
 package api
 
 import (
+	"drtest/randomize/internal"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestRandomize(t *testing.T) {
 
-	randomized := randomize(&Person{})
+	randomized := randomize(&Person{}, internal.Configuration{
+		MaxListSize:     4,
+		MaxStringLength: 5,
+	})
 	person := randomized.(*Person)
-	fmt.Println(person)
-	assert.True(t, len(person.FirstName) > 0)
-	assert.True(t, len(person.LastName) > 0)
-	assert.True(t, len(person.Hobbies) > 0)
-	assert.True(t, len(person.Hobbies[0]) > 0)
-	assert.True(t, person.Balance != 0)
+	fmt.Printf("---------\n%v", person)
+
+}
+
+type Pet struct {
+	Name string
+	Age  int64
+}
+
+type Coordinates struct {
+	Lat float64
+	Lon float64
 }
 
 type Person struct {
@@ -26,6 +35,9 @@ type Person struct {
 	LuckyNumbers []int64
 	Cool         bool
 	Balance      float64
+	Coordinates  Coordinates
+	Pets         []Pet
+	BFF          []Person
 }
 
 func (p Person) String() string {

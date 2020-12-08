@@ -12,7 +12,7 @@ func TestRandomizeSimpleValues(t *testing.T) {
 		type StringStruct struct {
 			String string
 		}
-		got := Randomize(&StringStruct{})
+		got := randomizeWithDefaults(&StringStruct{})
 		assert.NotNil(t, got)
 		stringField := getField(got, "String").String()
 		assert.True(t, len(stringField) > 0, "string is empty")
@@ -23,7 +23,7 @@ func TestRandomizeSimpleValues(t *testing.T) {
 			Int int64
 		}
 		in := &IntStruct{Int: 0}
-		got := Randomize(in)
+		got := randomizeWithDefaults(in)
 		assert.NotNil(t, got)
 		intVal := getField(got, "Int").Int()
 		assert.True(t, intVal != 0, "int has not changed")
@@ -34,7 +34,7 @@ func TestRandomizeSimpleValues(t *testing.T) {
 			Float float64
 		}
 		in := &FloatStruct{Float: 0.1}
-		got := Randomize(in)
+		got := randomizeWithDefaults(in)
 		assert.NotNil(t, got)
 		floatVal := getField(got, "Float").Float()
 		assert.True(t, floatVal != 0.1, "float has not changed")
@@ -45,7 +45,7 @@ func TestRandomizeSimpleValues(t *testing.T) {
 		type BooleanStruct struct {
 			Boolean bool
 		}
-		got := Randomize(&BooleanStruct{})
+		got := randomizeWithDefaults(&BooleanStruct{})
 		assert.NotNil(t, got)
 	})
 
@@ -56,7 +56,7 @@ func TestRandomizeSimpleValues(t *testing.T) {
 			Float64 float64
 			String  string
 		}
-		got := Randomize(&MultiStruct{true, 0, 0.0, ""})
+		got := randomizeWithDefaults(&MultiStruct{true, 0, 0.0, ""})
 		assert.NotNil(t, got)
 		assert.True(t, getField(got, "Int32").Int() > 0)
 		assert.True(t, getField(got, "Float64").Float() > 0.0)
@@ -74,7 +74,7 @@ func TestRandomizeSlices(t *testing.T) {
 		SliceBool    []bool
 	}
 
-	got := Randomize(&StructWithSlice{})
+	got := randomizeWithDefaults(&StructWithSlice{})
 	assert.NotNil(t, got)
 	assert.True(t, len(getField(got, "String").String()) > 0)
 	assert.NotEmpty(t, getField(got, "Slice").Slice(0, 1))
@@ -100,7 +100,7 @@ func TestNestedStructs(t *testing.T) {
 		MiddleStruct MiddleStruct
 	}
 
-	got := Randomize(&OuterStruct{})
+	got := randomizeWithDefaults(&OuterStruct{})
 	assert.NotNil(t, got)
 	assert.True(t, len(getField(got, "OuterName").String()) > 0)
 	assert.True(t, len(getField(got, "MiddleStruct").FieldByName("MiddleName").String()) > 0)
@@ -111,4 +111,11 @@ func TestNestedStructs(t *testing.T) {
 func getField(strukt interface{}, name string) reflect.Value {
 	elem := reflect.ValueOf(strukt).Elem()
 	return elem.FieldByName(name)
+}
+
+func randomizeWithDefaults(strukt interface{}) interface{} {
+	return Randomize(strukt, Configuration{
+		MaxListSize:     5,
+		MaxStringLength: 5,
+	})
 }
