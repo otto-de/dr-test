@@ -1,5 +1,7 @@
 package api
 
+import "drtest/randomize/internal"
+
 func randomize(strukt interface{}) interface{} {
-	return nil
+	return internal.Randomize(strukt)
 }
