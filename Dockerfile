@@ -3,9 +3,9 @@ FROM golang:alpine
 WORKDIR /opt/drtest
 
 ADD . .
+RUN go mod download
 
-# ADD schema
+# TODO: Dynamic loading of multiple schema datas
+RUN go run gen/gen.go gen/avro.go /opt/drtest/schema.avsc
 
-RUN cd /opt/drtest/gen && go run main.go avro.go
-
-CMD ["go", "run", "/opt/drtest/webserver/cmd/app.go", "/opt/drtest/schema.avsc"]
+CMD ["go", "run", "/opt/drtest/webserver/cmd/app.go"]
