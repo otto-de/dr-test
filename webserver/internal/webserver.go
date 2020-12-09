@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/thedevsaddam/gojsonq"
 	"log"
 	"net/http"
 	"os"
@@ -13,20 +12,10 @@ import (
 	"strings"
 )
 
-func generate(structName string, amount int) ([]interface{}, error) {
-	strukt, err := generated.Generate(structName, amount)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return strukt, nil
-}
-
-func getHandler(structName string) func(w http.ResponseWriter, r *http.Request) {
+func getHandler(recordName string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		amount := 1 // TODO: use quantity from path var
-		entities, err := generate(structName, amount)
+		entities, err := generated.Generate(recordName, amount)
 
 		if err != nil {
 			fmt.Println("ERROR generating:", err)
@@ -47,23 +36,17 @@ func getHandler(structName string) func(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func populateRouter(router *mux.Router, structName string) {
-	lowercased := strings.ToLower(structName)
+func populateRouter(router *mux.Router, recordName string) {
+	lowercased := strings.ToLower(recordName)
 	fmt.Println("Populating /" + lowercased)
-	router.HandleFunc("/"+lowercased, getHandler(structName)).Methods("GET")
+	router.HandleFunc("/"+lowercased, getHandler(recordName)).Methods("GET")
 }
 
-func getSchemaEntityName(schemaLocation string) string {
-	jq := gojsonq.New().File(schemaLocation)
-	res := jq.From("name").Get()
-	return fmt.Sprint(res)
-}
-
-func StartServer(host string, port int, schemaLocations []string) {
+func StartServer(host string, port int) {
 	r := mux.NewRouter()
 
-	for _, schemaLocation := range schemaLocations {
-		populateRouter(r, getSchemaEntityName(schemaLocation))
+	for _, recordName := range generated.GetRecordNames() {
+		populateRouter(r, recordName)
 	}
 
 	addr := host + ":" + strconv.Itoa(port)
