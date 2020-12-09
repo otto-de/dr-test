@@ -3,10 +3,13 @@ package internal
 import (
 	"drtest/randomize/api"
 	"fmt"
+	"github.com/cjrd/allocate"
+	"log"
 	"reflect"
 )
 
 func Randomize(strukt interface{}, configuration api.Configuration) interface{} {
+	allocate.MustZero(strukt)
 	fields := getFieldMeta(strukt)
 	fmt.Printf("Fields to fill: %v\n", fields)
 	for _, m := range fields {
@@ -41,23 +44,30 @@ func fillSimpleValue(strukt interface{}, fieldMeta fieldMeta, configuration api.
 	}
 }
 
-func setRandomValue(struktField reflect.Value, fieldMeta fieldMeta, configuration api.Configuration) {
+func setRandomValue(fieldToSet reflect.Value, fieldMeta fieldMeta, configuration api.Configuration) {
 	switch fieldMeta.Kind {
 	case reflect.String:
-		struktField.SetString(randomString(configuration.MaxStringLength))
+		fieldToSet.SetString(randomString(configuration.MaxStringLength))
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		struktField.SetInt(randomInt())
+		fieldToSet.SetInt(randomInt())
 	case reflect.Float32, reflect.Float64:
-		struktField.SetFloat(randomFloat())
+		fieldToSet.SetFloat(randomFloat())
 	case reflect.Bool:
-		struktField.SetBool(randomBool())
+		fieldToSet.SetBool(randomBool())
 	case reflect.Slice:
 		sliceType := reflect.TypeOf(fieldMeta.Value.Interface()).Elem()
 		size := randomIntCapped(configuration.MaxListSize)
 		slice := randomSlice(sliceType, size)
 		fmt.Printf("List size %d", size)
-		struktField.Set(slice.Slice(0, size))
+		fieldToSet.Set(slice.Slice(0, size))
+
+	case reflect.Ptr:
+		newStruct := reflect.New(fieldMeta.Value.Elem().Type())
+		Randomize(newStruct.Interface(), configuration)
+		fieldToSet.Set(newStruct)
+		log.Printf("Created %+v\n", newStruct.Interface())
+
 	default:
-		fmt.Printf("%v not supported", struktField.Kind())
+		fmt.Printf("%v not supported", fieldToSet.Kind())
 	}
 }

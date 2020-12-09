@@ -9,6 +9,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/thedevsaddam/gojsonq v2.3.0+incompatible
 	github.com/urfave/cli/v2 v2.3.0
+	github.com/cjrd/allocate v0.0.0-20191115010018-022b87fe59fc
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/stretchr/testify v1.6.1

@@ -2,6 +2,7 @@ package internal
 
 import (
 	"drtest/randomize/api"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -106,6 +107,37 @@ func TestNestedStructs(t *testing.T) {
 	assert.True(t, len(getField(got, "OuterName").String()) > 0)
 	assert.True(t, len(getField(got, "MiddleStruct").FieldByName("MiddleName").String()) > 0)
 	assert.True(t, len(getField(got, "MiddleStruct").FieldByName("InnerStruct").FieldByName("InnerName").String()) > 0)
+
+}
+
+func TestWithPointer(t *testing.T) {
+
+	type Inner struct {
+		Name string
+	}
+
+	type PointerStruct struct {
+		Name     string
+		Pointer2 *Inner
+	}
+
+	t.Run("pointer to existing struct", func(t *testing.T) {
+		got := randomizeWithDefaults(&PointerStruct{"foo", &Inner{}})
+		assert.NotNil(t, got)
+		assert.True(t, len(getField(got, "Name").String()) > 0)
+		assert.False(t, getField(got, "Pointer2").IsNil())
+	})
+
+	t.Run("pointer to nil", func(t *testing.T) {
+		got := randomizeWithDefaults(&PointerStruct{})
+		assert.NotNil(t, got)
+		assert.True(t, len(getField(got, "Name").String()) > 0)
+		assert.False(t, getField(got, "Pointer2").IsNil())
+
+		p := got.(*PointerStruct)
+		fmt.Printf("Name %q\n", p.Name)
+		fmt.Printf("Inner %+v", p.Pointer2)
+	})
 
 }
 
