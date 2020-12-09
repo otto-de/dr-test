@@ -14,7 +14,7 @@ Given your record's name is "Foo", your test samples can be fetched via ``/foo``
 
 ## Without Docker
 You can generate a test sample generator from multiple schemas as once.  
-All you have to do is run ``go run gen/main.go gen/avro.go`` to generate the necessary methods for the webserver.
+All you have to do is run ``go run gen/gen.go gen/avro.go --target-dir=./generated $PATH_TO_SCHEMA`` to generate the necessary methods for the webserver.
 Starting the webserver ``go run webserver/cmd/app.go`` will expose one endpoint per record name.
 
 ## ToDos
