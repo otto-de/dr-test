@@ -1,7 +1,7 @@
 package api
 
 import (
-	"drtest/randomize/internal"
+	"drtest/randomize/api"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -9,7 +9,7 @@ import (
 
 func TestRandomize(t *testing.T) {
 
-	randomized := Randomize(&Person{}, internal.Configuration{
+	randomized := Randomize(&Person{}, api.Configuration{
 		MaxListSize:     4,
 		MaxStringLength: 5,
 	})

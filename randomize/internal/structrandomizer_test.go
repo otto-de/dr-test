@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"drtest/randomize/api"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -114,7 +115,7 @@ func getField(strukt interface{}, name string) reflect.Value {
 }
 
 func randomizeWithDefaults(strukt interface{}) interface{} {
-	return Randomize(strukt, Configuration{
+	return Randomize(strukt, api.Configuration{
 		MaxListSize:     5,
 		MaxStringLength: 5,
 	})

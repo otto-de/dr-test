@@ -1,22 +1,18 @@
 package api
 
 import (
+	"drtest/randomize/api"
 	"drtest/randomize/internal"
 )
 
 func RandomizeWithDefaults(strukt interface{}) interface{} {
-	config := Configuration{
+	config := api.Configuration{
 		MaxListSize:     10,
 		MaxStringLength: 10,
 	}
 	return internal.Randomize(strukt, config)
 }
 
-func Randomize(strukt interface{}, configuration Configuration) interface{} {
+func Randomize(strukt interface{}, configuration api.Configuration) interface{} {
 	return internal.Randomize(strukt, configuration)
-}
-
-type Configuration struct {
-	MaxListSize     int
-	MaxStringLength int
 }

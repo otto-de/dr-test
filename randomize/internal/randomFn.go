@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"drtest/randomize/api"
 	"fmt"
 	"math/rand"
 	"reflect"
@@ -57,7 +58,7 @@ func randomSimpleValue(typ reflect.Type) interface{} {
 
 		nestedStruct := reflect.New(typ)
 		fmt.Printf("Nested struct\n%+v\n", nestedStruct)
-		Randomize(nestedStruct.Interface(), Configuration{
+		Randomize(nestedStruct.Interface(), api.Configuration{
 			MaxListSize:     3,
 			MaxStringLength: 10,
 		})
