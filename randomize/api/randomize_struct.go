@@ -1,6 +1,8 @@
 package api
 
-import "drtest/randomize/internal"
+import (
+	"drtest/randomize/internal"
+)
 
 func RandomizeWithDefaults(strukt interface{}) interface{} {
 	config := Configuration{
