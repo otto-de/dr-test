@@ -1,11 +1,12 @@
 package internal
 
 import (
+	"drtest/randomize/api"
 	"fmt"
 	"reflect"
 )
 
-func Randomize(strukt interface{}, configuration Configuration) interface{} {
+func Randomize(strukt interface{}, configuration api.Configuration) interface{} {
 	fields := getFieldMeta(strukt)
 	fmt.Printf("Fields to fill: %v\n", fields)
 	for _, m := range fields {
@@ -19,12 +20,7 @@ func Randomize(strukt interface{}, configuration Configuration) interface{} {
 	return strukt
 }
 
-type Configuration struct {
-	MaxListSize     int
-	MaxStringLength int
-}
-
-func fillNestedStruct(strukt interface{}, m fieldMeta, configuration Configuration) {
+func fillNestedStruct(strukt interface{}, m fieldMeta, configuration api.Configuration) {
 	elem := reflect.ValueOf(strukt).Elem()
 	field := (&elem).FieldByName(m.Name)
 	nestedStruct := reflect.New(field.Type())
@@ -34,7 +30,7 @@ func fillNestedStruct(strukt interface{}, m fieldMeta, configuration Configurati
 	field.Set(nestedStruct.Elem())
 }
 
-func fillSimpleValue(strukt interface{}, fieldMeta fieldMeta, configuration Configuration) {
+func fillSimpleValue(strukt interface{}, fieldMeta fieldMeta, configuration api.Configuration) {
 
 	elem := reflect.ValueOf(strukt).Elem()
 	f := elem.FieldByName(fieldMeta.Name)
@@ -45,7 +41,7 @@ func fillSimpleValue(strukt interface{}, fieldMeta fieldMeta, configuration Conf
 	}
 }
 
-func setRandomValue(struktField reflect.Value, fieldMeta fieldMeta, configuration Configuration) {
+func setRandomValue(struktField reflect.Value, fieldMeta fieldMeta, configuration api.Configuration) {
 	switch fieldMeta.Kind {
 	case reflect.String:
 		struktField.SetString(randomString(configuration.MaxStringLength))
