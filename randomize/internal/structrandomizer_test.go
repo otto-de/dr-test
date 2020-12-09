@@ -58,11 +58,53 @@ func TestRandomizeSimpleValues(t *testing.T) {
 			Float64 float64
 			String  string
 		}
-		got := randomizeWithDefaults(&MultiStruct{true, 0, 0.0, ""})
+		got := randomizeWithDefaults(&MultiStruct{})
 		assert.NotNil(t, got)
-		assert.True(t, getField(got, "Int32").Int() > 0)
-		assert.True(t, getField(got, "Float64").Float() > 0.0)
+		assert.True(t, getField(got, "Int32").Int() != 0)
+		assert.True(t, getField(got, "Float64").Float() != 0.0)
 		assert.True(t, len(getField(got, "String").String()) > 0)
+	})
+
+}
+
+func TestRandomizeMaps(t *testing.T) {
+
+	t.Run("map with primitive values", func(t *testing.T) {
+		type MapStruct struct {
+			Int     map[string]int
+			Float32 map[string]float32
+			Float64 map[string]float64
+			String  map[string]string
+			Bool    map[string]bool
+		}
+
+		got := randomizeWithDefaults(&MapStruct{}).(*MapStruct)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got.Int)
+		assert.NotEmpty(t, got.Float32)
+		assert.NotEmpty(t, got.Float64)
+		assert.NotEmpty(t, got.String)
+		assert.NotEmpty(t, got.Bool)
+	})
+
+	t.Run("map with struct values", func(t *testing.T) {
+		type StructA struct {
+			Name string
+			Bool bool
+		}
+
+		type StructB struct {
+			Map map[string]StructA
+		}
+
+		got := randomizeWithDefaults(&StructB{}).(*StructB)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got.Map)
+		for k, v := range got.Map {
+			assert.NotNil(t, k)
+			assert.NotNil(t, v)
+			assert.True(t, len(v.Name) > 0)
+		}
 	})
 
 }
@@ -147,8 +189,5 @@ func getField(strukt interface{}, name string) reflect.Value {
 }
 
 func randomizeWithDefaults(strukt interface{}) interface{} {
-	return Randomize(strukt, api.Configuration{
-		MaxListLength:   5,
-		MaxStringLength: 5,
-	})
+	return Randomize(strukt, api.DefaultConfiguration())
 }

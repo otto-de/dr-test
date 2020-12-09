@@ -2,6 +2,7 @@ package internal
 
 import (
 	"drtest/randomize/api"
+	"fmt"
 	"github.com/cjrd/allocate"
 	"log"
 	"reflect"
@@ -52,8 +53,10 @@ func setRandomValue(fieldToSet reflect.Value, fieldMeta fieldMeta, configuration
 	case reflect.Bool:
 		fieldToSet.SetBool(randomBool())
 	case reflect.Slice:
-		slice := createRandomSlice(fieldMeta, configuration)
-		fieldToSet.Set(slice)
+		fieldToSet.Set(buildRandomSlice(fieldMeta, configuration))
+	case reflect.Map:
+		fieldToSet.Set(buildRandomMap(fieldMeta, configuration))
+
 	case reflect.Ptr:
 		newStruct := reflect.New(fieldMeta.Value.Elem().Type())
 		Randomize(newStruct.Interface(), configuration)
@@ -63,13 +66,38 @@ func setRandomValue(fieldToSet reflect.Value, fieldMeta fieldMeta, configuration
 	}
 }
 
-func createRandomSlice(fieldMeta fieldMeta, configuration api.Configuration) reflect.Value {
-	sliceType := reflect.TypeOf(fieldMeta.Value.Interface()).Elem()
-	size := configuration.MinListLength + randomIntCapped(configuration.MaxListLength)
-	if size > configuration.MaxListLength {
-		size = configuration.MaxListLength
+func buildRandomMap(fieldMeta fieldMeta, configuration api.Configuration) reflect.Value {
+
+	valueType := reflect.TypeOf(fieldMeta.Value.Interface()).Elem()
+	mapType := reflect.MapOf(reflect.TypeOf("str"), valueType)
+	m := reflect.MakeMap(mapType)
+
+	size := getLen(configuration.MinMapLength, configuration.MaxMapLength)
+	for i := 0; i < size; i++ {
+		key := fmt.Sprintf("%d%v", i, randomString(configuration.MaxStringLength))
+		value := randomSimpleValue(valueType)
+		fmt.Printf("Key %v Val %v", key, value)
+		m.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(value))
 	}
+	return m
+
+}
+
+func buildRandomSlice(fieldMeta fieldMeta, configuration api.Configuration) reflect.Value {
+	sliceType := reflect.TypeOf(fieldMeta.Value.Interface()).Elem()
+	size := getLen(configuration.MinListLength, configuration.MaxListLength)
 	slice := randomSlice(sliceType, size)
 	return slice.Slice(0, size)
 
+}
+
+func getLen(minLen, maxLen int) int {
+	if maxLen <= 0 {
+		return 1
+	}
+	proposed := randomIntCapped(maxLen)
+	if proposed < minLen {
+		return minLen
+	}
+	return proposed
 }

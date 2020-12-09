@@ -45,6 +45,7 @@ func randomByte() byte {
 }
 
 func randomSlice(sliceType reflect.Type, size int) reflect.Value {
+
 	sliceOfType := reflect.SliceOf(sliceType)
 	fmt.Printf("Slice type %v", sliceOfType)
 	slice := reflect.MakeSlice(sliceOfType, 0, 5)
@@ -59,9 +60,13 @@ func randomSimpleValue(typ reflect.Type) interface{} {
 	switch typ.Kind() {
 	case reflect.String:
 		return randomString(10)
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+	case reflect.Int:
+		return rand.Int()
+	case reflect.Int32, reflect.Int64:
 		return randomInt64()
-	case reflect.Float32, reflect.Float64:
+	case reflect.Float32:
+		return rand.Float32()
+	case reflect.Float64:
 		return randomFloat()
 	case reflect.Bool:
 		return randomBool()

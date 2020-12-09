@@ -3,7 +3,6 @@ package api
 import (
 	"drtest/randomize/api"
 	"encoding/json"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -39,9 +38,7 @@ func TestRandomize(t *testing.T) {
 		MaxListLength:   4,
 		MaxStringLength: 5,
 	})
-	person := randomized.(*Person)
-	fmt.Printf("---------\n%v", person)
-
+	assert.NotNil(t, randomized.(*Person))
 }
 
 type Pet struct {

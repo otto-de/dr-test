@@ -6,11 +6,7 @@ import (
 )
 
 func RandomizeWithDefaults(strukt interface{}) interface{} {
-	config := api.Configuration{
-		MaxListLength:   10,
-		MaxStringLength: 10,
-	}
-	return internal.Randomize(strukt, config)
+	return internal.Randomize(strukt, api.DefaultConfiguration())
 }
 
 func Randomize(strukt interface{}, configuration api.Configuration) interface{} {
