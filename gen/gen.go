@@ -14,18 +14,21 @@ import (
 
 func main() {
 	var targetDir string
-	var schemaFiles []string
 
 	app := &cli.App{
-		Name: "gem",
+		Name:      "gen",
+		Usage:     "Generate the code you need",
+		UsageText: "gen [--target-dir dir] schema-files...",
 		Flags: []cli.Flag{
-			&cli.PathFlag{Name: "target-dir", Required: true, Aliases: []string{"t"}, Destination: &targetDir},
+			&cli.PathFlag{
+				Name:        "target-dir",
+				Value:       "generated",
+				Aliases:     []string{"t"},
+				Destination: &targetDir,
+			},
 		},
 		Action: func(c *cli.Context) error {
-			for i := range c.Args().Slice() {
-				schemaFiles = append(schemaFiles, c.Args().Get(i))
-			}
-			return nil
+			return run(targetDir, c)
 		},
 	}
 
@@ -33,10 +36,23 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func run(targetDir string, c *cli.Context) error {
+	var schemaFiles []string
+
+	fmt.Printf("Args: %s", c.Args())
+	if c.NArg() == 0 {
+		cli.ShowAppHelpAndExit(c, 1)
+	}
+
+	for i := range c.Args().Slice() {
+		schemaFiles = append(schemaFiles, c.Args().Get(i))
+	}
 
 	targetDirName, err := filepath.Abs(targetDir)
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	err = cleanTargetDir(targetDirName)
@@ -46,12 +62,12 @@ func main() {
 	for i := range schemaFiles {
 		schemaFile, err := os.Open(schemaFiles[i])
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 
 		record, err := loadTopLevelEntityNameFromSchema(schemaFile)
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 
 		records = append(records, record)
@@ -60,7 +76,7 @@ func main() {
 
 		err = initSchemaDirectory(targetDirName, record)
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 
 		lowerCasedEntity := strings.ToLower(record)
@@ -68,27 +84,28 @@ func main() {
 		code := generateFunction(record)
 		err = writeFile(lowerCasedEntity+".go", code, targetDirName+"/"+lowerCasedEntity)
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 
 	}
 
 	avroTargetDir, err := initAvroDirectory(targetDirName)
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	err = GenerateAvro(schemaFiles, avroTargetDir)
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	code := generateGeneratorMap(records)
 	err = writeFile("generator.go", code, targetDirName)
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
+	return nil
 }
 
 func writeFile(fileName string, content string, parentDir string) error {
@@ -133,11 +150,11 @@ func generateFunction(entity string) string {
 	upperCasedEntity := strings.Title(entity)
 	lowerCasedEntity := strings.ToLower(entity)
 	packageName := "drtest/generated/avro"
-	apiPackageName := fmt.Sprintf("drtest/randomize/pkg")
+	pkgPackageName := fmt.Sprintf("drtest/randomize/pkg")
 
 	f := NewFile(lowerCasedEntity)
 	f.ImportName(packageName, "avro")
-	f.ImportName(apiPackageName, "api")
+	f.ImportName(pkgPackageName, "pkg")
 	f.Func().
 		Id(fmt.Sprintf("Generate%s", upperCasedEntity)).Params(Id("amount").Int()).Index().Interface().
 		Block(
@@ -151,7 +168,7 @@ func generateFunction(entity string) string {
 
 	f.Func().Id("randomize").Params(Id(lowerCasedEntity).Interface()).Interface().
 		Block(
-			Return(Qual(apiPackageName, "RandomizeWithDefaults").Call(Id(lowerCasedEntity))),
+			Return(Qual(pkgPackageName, "RandomizeWithDefaults").Call(Id(lowerCasedEntity))),
 		)
 
 	return fmt.Sprintf("%#v", f)
@@ -192,7 +209,6 @@ func generateGeneratorMap(records []string) string {
 		Return(Index().String().Values(recordNames...)),
 	)
 
-	fmt.Printf("%#v\n", f)
 	return fmt.Sprintf("%#v", f)
 }
 
