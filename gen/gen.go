@@ -162,37 +162,44 @@ func generateGeneratorMap(records []string) string {
 	f.ImportName("errors", "errors")
 
 	var caseStatements []Code
+	var recordNames []Code
+
 	for i := range records {
 		record := records[i]
 		lowerCasedRecord := strings.ToLower(record)
 		f.ImportName(fmt.Sprintf("drtest/generated/%s", lowerCasedRecord), lowerCasedRecord)
 
-		caseStatementForRecord := generateCaseStatement(record)
+		caseStatementForRecord := generateCaseStatement(lowerCasedRecord)
 		caseStatements = append(caseStatements, caseStatementForRecord)
+
+		recordNames = append(recordNames, Lit(lowerCasedRecord))
 	}
 
 	caseStatements = append(caseStatements, Default().Block(
-		Return(Nil(), Qual("errors", "New").Call(Lit("struct not found")))))
+		Return(Nil(), Qual("errors", "New").Call(Lit("record not found")))))
 
 	f.Func().Id("Generate").Params(
-		Id("structName").String(),
+		Id("recordName").String(),
 		Id("amount").Int()).
 		Call(Index().Interface(), Id("error")).
 		Block(
-			Switch(Id("structName").
+			Switch(Id("recordName").
 				Block(caseStatements...),
 			),
 		)
 
+	f.Func().Id("GetRecordNames").Params().Index().String().Block(
+		Return(Index().String().Values(recordNames...)),
+	)
+
+	fmt.Printf("%#v\n", f)
 	return fmt.Sprintf("%#v", f)
 }
 
 func generateCaseStatement(record string) *Statement {
 	upperCasedRecord := strings.Title(record)
-	lowerCasedRecord := strings.ToLower(record)
-
-	return Case(Lit(upperCasedRecord)).
+	return Case(Lit(record)).
 		Block(
-			Return(Qual(fmt.Sprintf("drtest/generated/%s", lowerCasedRecord), fmt.Sprintf("Generate%s", upperCasedRecord)).Call(Id("amount")), Nil()),
+			Return(Qual(fmt.Sprintf("drtest/generated/%s", record), fmt.Sprintf("Generate%s", upperCasedRecord)).Call(Id("amount")), Nil()),
 		)
 }
