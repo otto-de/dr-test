@@ -1,6 +1,7 @@
 package api
 
 type Configuration struct {
-	MaxListSize     int
+	MinListLength   int
+	MaxListLength   int
 	MaxStringLength int
 }

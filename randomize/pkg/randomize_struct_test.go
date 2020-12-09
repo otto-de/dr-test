@@ -4,13 +4,39 @@ import (
 	"drtest/randomize/api"
 	"encoding/json"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func TestFillPrimitiveAvroFields(t *testing.T) {
+	type Avro struct {
+		Bool   bool
+		Int    int32
+		Long   int64
+		Float  float32
+		Double float64
+		Bytes  []byte
+		String string
+		Array  []string
+		Map    map[string]int
+	}
+
+	avro := Randomize(&Avro{}, api.Configuration{
+		MinListLength:   1,
+		MaxListLength:   20,
+		MaxStringLength: 2,
+	}).(*Avro)
+	assert.NotNil(t, &avro)
+	assert.NotEmpty(t, avro.Bytes, "bytes array is empty")
+	assert.NotEmpty(t, avro.Array, "string array is empty")
+	assert.NotNil(t, avro.Map, "map is empty")
+
+}
 
 func TestRandomize(t *testing.T) {
 
 	randomized := Randomize(&Person{}, api.Configuration{
-		MaxListSize:     4,
+		MaxListLength:   4,
 		MaxStringLength: 5,
 	})
 	person := randomized.(*Person)

@@ -148,7 +148,7 @@ func getField(strukt interface{}, name string) reflect.Value {
 
 func randomizeWithDefaults(strukt interface{}) interface{} {
 	return Randomize(strukt, api.Configuration{
-		MaxListSize:     5,
+		MaxListLength:   5,
 		MaxStringLength: 5,
 	})
 }

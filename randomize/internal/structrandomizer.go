@@ -45,17 +45,15 @@ func setRandomValue(fieldToSet reflect.Value, fieldMeta fieldMeta, configuration
 	switch fieldMeta.Kind {
 	case reflect.String:
 		fieldToSet.SetString(randomString(configuration.MaxStringLength))
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		fieldToSet.SetInt(randomInt())
+	case reflect.Int32, reflect.Int64:
+		fieldToSet.SetInt(randomInt64())
 	case reflect.Float32, reflect.Float64:
 		fieldToSet.SetFloat(randomFloat())
 	case reflect.Bool:
 		fieldToSet.SetBool(randomBool())
 	case reflect.Slice:
-		sliceType := reflect.TypeOf(fieldMeta.Value.Interface()).Elem()
-		size := randomIntCapped(configuration.MaxListSize)
-		slice := randomSlice(sliceType, size)
-		fieldToSet.Set(slice.Slice(0, size))
+		slice := createRandomSlice(fieldMeta, configuration)
+		fieldToSet.Set(slice)
 	case reflect.Ptr:
 		newStruct := reflect.New(fieldMeta.Value.Elem().Type())
 		Randomize(newStruct.Interface(), configuration)
@@ -63,4 +61,15 @@ func setRandomValue(fieldToSet reflect.Value, fieldMeta fieldMeta, configuration
 	default:
 		log.Printf("%v not supported.\n", fieldToSet.Kind())
 	}
+}
+
+func createRandomSlice(fieldMeta fieldMeta, configuration api.Configuration) reflect.Value {
+	sliceType := reflect.TypeOf(fieldMeta.Value.Interface()).Elem()
+	size := configuration.MinListLength + randomIntCapped(configuration.MaxListLength)
+	if size > configuration.MaxListLength {
+		size = configuration.MaxListLength
+	}
+	slice := randomSlice(sliceType, size)
+	return slice.Slice(0, size)
+
 }

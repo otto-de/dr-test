@@ -7,7 +7,7 @@ import (
 
 func RandomizeWithDefaults(strukt interface{}) interface{} {
 	config := api.Configuration{
-		MaxListSize:     10,
+		MaxListLength:   10,
 		MaxStringLength: 10,
 	}
 	return internal.Randomize(strukt, config)

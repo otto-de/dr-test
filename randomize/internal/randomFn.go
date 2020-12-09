@@ -17,7 +17,10 @@ func randomString(maxLength int) string {
 	return string(b)
 }
 
-func randomInt() int64 {
+func randomInt63() int32 {
+	return rand.Int31()
+}
+func randomInt64() int64 {
 	return rand.Int63()
 }
 
@@ -31,6 +34,14 @@ func randomFloat() float64 {
 
 func randomBool() bool {
 	return rand.Float32() <= 0.5
+}
+
+func randomByte() byte {
+	if randomBool() {
+		return 0
+	} else {
+		return 1
+	}
 }
 
 func randomSlice(sliceType reflect.Type, size int) reflect.Value {
@@ -49,17 +60,20 @@ func randomSimpleValue(typ reflect.Type) interface{} {
 	case reflect.String:
 		return randomString(10)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return randomInt()
+		return randomInt64()
 	case reflect.Float32, reflect.Float64:
 		return randomFloat()
 	case reflect.Bool:
 		return randomBool()
+	case reflect.Uint8:
+		return randomByte()
+
 	default:
 
 		nestedStruct := reflect.New(typ)
 		fmt.Printf("Nested struct\n%+v\n", nestedStruct)
 		Randomize(nestedStruct.Interface(), api.Configuration{
-			MaxListSize:     3,
+			MaxListLength:   3,
 			MaxStringLength: 10,
 		})
 
