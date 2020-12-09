@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	. "github.com/dave/jennifer/jen"
+	"github.com/urfave/cli/v2"
 	"io/ioutil"
 	"log"
 	"os"
@@ -12,64 +13,107 @@ import (
 )
 
 func main() {
-	generatedDirName, err := filepath.Abs("../generated")
+	var targetDir string
+	var schemaFiles []string
+
+	app := &cli.App{
+		Name: "gem",
+		Flags: []cli.Flag{
+			&cli.PathFlag{Name: "target-dir", Required: true, Aliases: []string{"t"}, Destination: &targetDir},
+		},
+		Action: func(c *cli.Context) error {
+			for i := range c.Args().Slice() {
+				schemaFiles = append(schemaFiles, c.Args().Get(i))
+			}
+			return nil
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	targetDirName, err := filepath.Abs(targetDir)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	schemaFile, err := os.Open("../schema.avsc")
+	err = cleanTargetDir(targetDirName)
+	log.Printf("Generating code to directory %s", targetDirName)
+
+	var records []string
+	for i := range schemaFiles {
+		schemaFile, err := os.Open(schemaFiles[i])
+		if err != nil {
+			log.Panic(err)
+		}
+
+		record, err := loadTopLevelEntityNameFromSchema(schemaFile)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		records = append(records, record)
+
+		fmt.Printf("Root record for schema %s -> %s\n", schemaFile.Name(), record)
+
+		err = initSchemaDirectory(targetDirName, record)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		lowerCasedEntity := strings.ToLower(record)
+
+		code := generateFunction(record)
+		err = writeFile(lowerCasedEntity+".go", code, targetDirName+"/"+lowerCasedEntity)
+		if err != nil {
+			log.Panic(err)
+		}
+
+	}
+
+	avroTargetDir, err := initAvroDirectory(targetDirName)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	name, err := loadTopLevelEntityNameFromSchema(schemaFile)
+	err = GenerateAvro(schemaFiles, avroTargetDir)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	fmt.Printf("TopLevel: %s\n", name)
-
-	err = cleanDirectory(generatedDirName)
+	code := generateGeneratorMap(records)
+	err = writeFile("generator.go", code, targetDirName)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	lowerCasedEntity := strings.ToLower(name)
-
-	code := generateGeneratorMap(name)
-	err = writeFile("generator", code, generatedDirName)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	code = generateFunction(name)
-	err = writeFile(lowerCasedEntity, code, generatedDirName + "/" + lowerCasedEntity)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	avroTargetDir := generatedDirName + "/" + lowerCasedEntity + "/avro"
-	err = os.MkdirAll(avroTargetDir, 0755)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	err = GenerateAvro([]string{"../schema.avsc"}, avroTargetDir)
-	if err != nil {
-		log.Panic(err)
-	}
 }
 
 func writeFile(fileName string, content string, parentDir string) error {
-	err := os.Mkdir(parentDir, 0755)
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile(parentDir + "/" + fileName + ".go", []byte(content), 0644)
+	return ioutil.WriteFile(parentDir+"/"+fileName, []byte(content), 0644)
 }
 
-func cleanDirectory(dirToClean string) error {
-	return os.RemoveAll(dirToClean)
+func cleanTargetDir(targetDir string) error {
+	return os.RemoveAll(targetDir)
+}
+
+func initAvroDirectory(targetDir string) (string, error) {
+	dir := targetDir + "/avro"
+	log.Printf("Creating directory %s", dir)
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		return "", err
+	}
+	return dir, nil
+}
+
+func initSchemaDirectory(targetDir, entityName string) error {
+	lowerCasedEntityName := strings.ToLower(entityName)
+	dir := targetDir + "/" + lowerCasedEntityName
+	log.Printf("Creating directory %s", dir)
+	return os.MkdirAll(dir, 0755)
 }
 
 func loadTopLevelEntityNameFromSchema(schema *os.File) (string, error) {
@@ -82,14 +126,13 @@ func loadTopLevelEntityNameFromSchema(schema *os.File) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(m)
 	return m["name"].(string), nil
 }
 
 func generateFunction(entity string) string {
 	upperCasedEntity := strings.Title(entity)
 	lowerCasedEntity := strings.ToLower(entity)
-	packageName := fmt.Sprintf("drtest/generated/%s/avro", lowerCasedEntity)
+	packageName := "drtest/generated/avro"
 	apiPackageName := fmt.Sprintf("drtest/randomize/api")
 
 	f := NewFile(lowerCasedEntity)
@@ -108,18 +151,28 @@ func generateFunction(entity string) string {
 
 	f.Func().Id("randomize").Params(Id(lowerCasedEntity).Interface()).Interface().
 		Block(
-			Return(Qual(apiPackageName,"RandomizeWithDefaults").Call(Id(lowerCasedEntity))),
+			Return(Qual(apiPackageName, "RandomizeWithDefaults").Call(Id(lowerCasedEntity))),
 		)
 
 	return fmt.Sprintf("%#v", f)
 }
 
-func generateGeneratorMap(entity string) string {
-	upperCasedEntity := strings.Title(entity)
-	lowerCasedEntity := strings.ToLower(entity)
+func generateGeneratorMap(records []string) string {
 	f := NewFile("generated")
-	f.ImportName(fmt.Sprintf("drtest/generated/%s", lowerCasedEntity), lowerCasedEntity)
 	f.ImportName("errors", "errors")
+
+	var caseStatements []Code
+	for i := range records {
+		record := records[i]
+		lowerCasedRecord := strings.ToLower(record)
+		f.ImportName(fmt.Sprintf("drtest/generated/%s", lowerCasedRecord), lowerCasedRecord)
+
+		caseStatementForRecord := generateCaseStatement(record)
+		caseStatements = append(caseStatements, caseStatementForRecord)
+	}
+
+	caseStatements = append(caseStatements, Default().Block(
+		Return(Nil(), Qual("errors", "New").Call(Lit("struct not found")))))
 
 	f.Func().Id("Generate").Params(
 		Id("structName").String(),
@@ -127,15 +180,19 @@ func generateGeneratorMap(entity string) string {
 		Call(Index().Interface(), Id("error")).
 		Block(
 			Switch(Id("structName").
-				Block(
-					Case(Lit(upperCasedEntity)).
-						Block(
-							Return(Qual(fmt.Sprintf("drtest/generated/%s", lowerCasedEntity), fmt.Sprintf("Generate%s", upperCasedEntity)).Call(Id("amount")), Nil()),
-						),
-					Default().Block(
-						Return(Nil(), Qual("errors", "New").Call(Lit("struct not found"))))),
+				Block(caseStatements...),
 			),
 		)
 
 	return fmt.Sprintf("%#v", f)
+}
+
+func generateCaseStatement(record string) *Statement {
+	upperCasedRecord := strings.Title(record)
+	lowerCasedRecord := strings.ToLower(record)
+
+	return Case(Lit(upperCasedRecord)).
+		Block(
+			Return(Qual(fmt.Sprintf("drtest/generated/%s", lowerCasedRecord), fmt.Sprintf("Generate%s", upperCasedRecord)).Call(Id("amount")), Nil()),
+		)
 }
