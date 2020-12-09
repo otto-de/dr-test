@@ -1,17 +1,18 @@
-/*
-WARNING: This file will be re-generated on build.
-Changes here will be overriden!
-*/
-
 package generated
 
 import (
+	"drtest/generated/person"
 	"errors"
 )
 
-func Generate(structName string, amount int) ([]interface{}, error) {
-	switch structName {
+func Generate(recordName string, amount int) ([]interface{}, error) {
+	switch recordName {
+	case "person":
+		return person.GeneratePerson(amount), nil
 	default:
-		return nil, errors.New("struct not found")
+		return nil, errors.New("record not found")
 	}
+}
+func GetRecordNames() []string {
+	return []string{"person"}
 }

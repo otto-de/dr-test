@@ -133,7 +133,7 @@ func generateFunction(entity string) string {
 	upperCasedEntity := strings.Title(entity)
 	lowerCasedEntity := strings.ToLower(entity)
 	packageName := "drtest/generated/avro"
-	apiPackageName := fmt.Sprintf("drtest/randomize/api")
+	apiPackageName := fmt.Sprintf("drtest/randomize/pkg")
 
 	f := NewFile(lowerCasedEntity)
 	f.ImportName(packageName, "avro")
