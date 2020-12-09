@@ -47,24 +47,24 @@ func getHandler(structName string) func(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func populateRouter(router *mux.Router, structNames []string) {
-	for _, structName := range structNames {
-		lowercased := strings.ToLower(structName)
-		fmt.Println("Populating /" + lowercased)
-		router.HandleFunc("/"+lowercased, getHandler(structName)).Methods("GET")
-	}
+func populateRouter(router *mux.Router, structName string) {
+	lowercased := strings.ToLower(structName)
+	fmt.Println("Populating /" + lowercased)
+	router.HandleFunc("/"+lowercased, getHandler(structName)).Methods("GET")
 }
 
-func getSchemaEntityName() string {
-	jq := gojsonq.New().File("../schema.avsc")
+func getSchemaEntityName(schemaLocation string) string {
+	jq := gojsonq.New().File(schemaLocation)
 	res := jq.From("name").Get()
 	return fmt.Sprint(res)
 }
 
-func StartServer(host string, port int) {
+func StartServer(host string, port int, schemaLocations []string) {
 	r := mux.NewRouter()
 
-	populateRouter(r, []string{getSchemaEntityName()})
+	for _, schemaLocation := range schemaLocations {
+		populateRouter(r, getSchemaEntityName(schemaLocation))
+	}
 
 	addr := host + ":" + strconv.Itoa(port)
 
