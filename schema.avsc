@@ -54,6 +54,13 @@
                 "items": "string"
             },
             "doc": "The person's hobbies"
+        },
+        {
+            "name" : "favourites",
+            "type" : {
+                "type" : "map",
+                "values" : "long"
+            }
         }
     ]
 }
