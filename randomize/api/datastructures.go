@@ -5,6 +5,7 @@ type Configuration struct {
 	MaxListLength   int
 	MinMapLength    int
 	MaxMapLength    int
+	MinStringLength int
 	MaxStringLength int
 }
 
@@ -14,6 +15,7 @@ func DefaultConfiguration() Configuration {
 		MaxListLength:   10,
 		MinMapLength:    1,
 		MaxMapLength:    5,
+		MinStringLength: 5,
 		MaxStringLength: 15,
 	}
 }

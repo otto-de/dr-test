@@ -1,4 +1,4 @@
-package internal
+package fieldextraction
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -8,7 +8,7 @@ import (
 
 func TestFindFields(t *testing.T) {
 
-	assertFieldMeta := func(t *testing.T, data []fieldMeta, index int, name string, kind reflect.Kind) {
+	assertFieldMeta := func(t *testing.T, data []FieldMeta, index int, name string, kind reflect.Kind) {
 		t.Helper()
 		assert.True(t, index <= len(data), "index %d out of bounds", index)
 		meta := data[index]
@@ -23,7 +23,7 @@ func TestFindFields(t *testing.T) {
 			String2 string
 		}
 
-		got := getFieldMeta(&StringStruct{})
+		got := ExtractFieldMetadata(&StringStruct{})
 		assert.Len(t, got, 2)
 		assertFieldMeta(t, got, 0, "String1", reflect.String)
 		assertFieldMeta(t, got, 1, "String2", reflect.String)
@@ -39,7 +39,7 @@ func TestFindFields(t *testing.T) {
 			Int5 int64
 		}
 
-		got := getFieldMeta(&IntStruct{})
+		got := ExtractFieldMetadata(&IntStruct{})
 		assert.Len(t, got, 5)
 		assertFieldMeta(t, got, 0, "Int1", reflect.Int)
 		assertFieldMeta(t, got, 1, "Int2", reflect.Int8)
@@ -55,7 +55,7 @@ func TestFindFields(t *testing.T) {
 			Float2 float64
 		}
 
-		got := getFieldMeta(&FloatStruct{})
+		got := ExtractFieldMetadata(&FloatStruct{})
 		assert.Len(t, got, 2)
 		assertFieldMeta(t, got, 0, "Float1", reflect.Float32)
 		assertFieldMeta(t, got, 1, "Float2", reflect.Float64)
@@ -67,7 +67,7 @@ func TestFindFields(t *testing.T) {
 			Boolean bool
 		}
 
-		got := getFieldMeta(&BooleanStruct{})
+		got := ExtractFieldMetadata(&BooleanStruct{})
 		assert.Len(t, got, 1)
 		assertFieldMeta(t, got, 0, "Boolean", reflect.Bool)
 	})
@@ -80,7 +80,7 @@ func TestFindFields(t *testing.T) {
 			Struct AnotherStruct
 		}
 
-		got := getFieldMeta(&StructStruct{})
+		got := ExtractFieldMetadata(&StructStruct{})
 		assert.Len(t, got, 1)
 		assertFieldMeta(t, got, 0, "Struct", reflect.Struct)
 	})
@@ -90,7 +90,7 @@ func TestFindFields(t *testing.T) {
 			Slice []interface{}
 		}
 
-		got := getFieldMeta(&SliceStruct{})
+		got := ExtractFieldMetadata(&SliceStruct{})
 		assert.Len(t, got, 1)
 		assertFieldMeta(t, got, 0, "Slice", reflect.Slice)
 	})
@@ -102,7 +102,7 @@ func TestFindFields(t *testing.T) {
 			Slice  []interface{}
 		}
 
-		got := getFieldMeta(&MixedStruct{})
+		got := ExtractFieldMetadata(&MixedStruct{})
 		assert.Len(t, got, 3)
 		assertFieldMeta(t, got, 0, "String", reflect.String)
 		assertFieldMeta(t, got, 1, "Int", reflect.Int)

@@ -71,7 +71,8 @@ func TestRandomizeMaps(t *testing.T) {
 
 	t.Run("map with primitive values", func(t *testing.T) {
 		type MapStruct struct {
-			Int     map[string]int
+			Int32   map[string]int32
+			Int64   map[string]int64
 			Float32 map[string]float32
 			Float64 map[string]float64
 			String  map[string]string
@@ -80,7 +81,8 @@ func TestRandomizeMaps(t *testing.T) {
 
 		got := randomizeWithDefaults(&MapStruct{}).(*MapStruct)
 		assert.NotNil(t, got)
-		assert.NotEmpty(t, got.Int)
+		assert.NotEmpty(t, got.Int32)
+		assert.NotEmpty(t, got.Int64)
 		assert.NotEmpty(t, got.Float32)
 		assert.NotEmpty(t, got.Float64)
 		assert.NotEmpty(t, got.String)
@@ -159,12 +161,12 @@ func TestWithPointer(t *testing.T) {
 	}
 
 	type PointerStruct struct {
-		Name     string
+		//	Name     string
 		Pointer2 *Inner
 	}
 
 	t.Run("pointer to existing struct", func(t *testing.T) {
-		got := randomizeWithDefaults(&PointerStruct{"foo", &Inner{}})
+		got := randomizeWithDefaults(&PointerStruct{&Inner{}})
 		assert.NotNil(t, got)
 		assert.True(t, len(getField(got, "Name").String()) > 0)
 		assert.False(t, getField(got, "Pointer2").IsNil())
@@ -177,7 +179,7 @@ func TestWithPointer(t *testing.T) {
 		assert.False(t, getField(got, "Pointer2").IsNil())
 
 		p := got.(*PointerStruct)
-		fmt.Printf("Name %q\n", p.Name)
+		//	fmt.Printf("Name %q\n", p.Name)
 		fmt.Printf("Inner %+v", p.Pointer2)
 	})
 

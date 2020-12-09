@@ -3,6 +3,7 @@ package pkg
 import (
 	"drtest/randomize/api"
 	"encoding/json"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -14,19 +15,20 @@ func TestFillPrimitiveAvroFields(t *testing.T) {
 		Long   int64
 		Float  float32
 		Double float64
-		Bytes  []byte
+		//Bytes  []byte
 		String string
 		Array  []string
-		Map    map[string]int
+		Map    map[string]int32
 	}
 
 	avro := Randomize(&Avro{}, api.Configuration{
 		MinListLength:   1,
 		MaxListLength:   20,
+		MinStringLength: 1,
 		MaxStringLength: 2,
 	}).(*Avro)
 	assert.NotNil(t, &avro)
-	assert.NotEmpty(t, avro.Bytes, "bytes array is empty")
+	//	assert.NotEmpty(t, avro.Bytes, "bytes array is empty")
 	assert.NotEmpty(t, avro.Array, "string array is empty")
 	assert.NotNil(t, avro.Map, "map is empty")
 
@@ -35,10 +37,16 @@ func TestFillPrimitiveAvroFields(t *testing.T) {
 func TestRandomize(t *testing.T) {
 
 	randomized := Randomize(&Person{}, api.Configuration{
-		MaxListLength:   4,
-		MaxStringLength: 5,
+		MinListLength:   1,
+		MaxListLength:   1,
+		MinMapLength:    1,
+		MaxMapLength:    1,
+		MinStringLength: 1,
+		MaxStringLength: 10,
 	})
-	assert.NotNil(t, randomized.(*Person))
+	person := randomized.(*Person)
+	assert.NotNil(t, person)
+	fmt.Printf("%+v", person)
 }
 
 type Pet struct {
@@ -52,15 +60,16 @@ type Coordinates struct {
 }
 
 type Person struct {
-	FirstName         string
-	LastName          string
-	Hobbies           []string
-	LuckyNumbers      []int64
-	Cool              bool
-	Balance           float64
-	Coordinates       Coordinates
-	Pets              []Pet
-	SuperBesteFreunde []Person
+	Map          map[string]Pet
+	AnotherMap   map[string]int32
+	FirstName    string
+	LastName     string
+	Hobbies      []string
+	LuckyNumbers []int64
+	Cool         bool
+	Balance      float64
+	Coordinates  Coordinates
+	Pets         []Pet
 }
 
 func (p Person) String() string {
