@@ -1,9 +1,10 @@
 package main
 
 import (
-	webserver "drtest/webserver/internal"
+	"drtest/webserver/internal"
+	webserver "drtest/webserver/pkg"
 )
 
 func main() {
-	webserver.StartServer("127.0.0.1", 8080)
+	webserver.Start(internal.ProductionWebserver{}, "127.0.0.1", 8080)
 }
