@@ -1,16 +1,49 @@
 # Dr. Test
 
 ## Installation
-Put avro schema in root directory named "schema.avsc"
+Create the docker image using the following command:
 
-Run ``docker build -t drtest .``
+```shell
+docker build -t drtest .
+```
 
 ## Usage
-Start container. Webserver starts on container port 8080 by default.
+### Using run.sh
+`run.sh` is meant to simplify the usage of `dr-test`. After building the docker image 
+using the step described above, call the script with the schema files you want to serve 
+data for.
 
-Run ``docker run -p 8080 drtest``.
+```shell
+./run.sh drtest:latest my-schema1.avsc my-schema2.avsc
+```
 
-Given your record's name is "Foo", your test samples can be fetched via ``/foo``.
+The script will then call the docker image with the schema files mounted into the
+expected directory.
+
+### Using docker run
+If you would like to use `docker run` directly, feel free to do so.
+
+You can either call `docker run` and pass your schema files as mounted files:
+
+```shell
+docker run -v /path/to/my-schema1.avsc:/opt/schemafiles/my-schema1.avsc drtest:latest
+```
+
+Or to pass multiple schema files:
+
+```shell
+docker run -v /path/to/my-schema1.avsc:/opt/schemafiles/my-schema1.avsc -v /other/path/to/my-schema2.avsc:/opt/schemafiles/my-schema2.avsc drtest:latest
+```
+
+You can also mount an entire local directory. `dr-test` will use all files with an `.avsc` extension. 
+
+The webserver starts on container port 8080 by default. You can overwrite it using docker's `-p` flag.
+
+Given your record's name is `Foo`, your test samples can be fetched via ``/foo``.
+
+```shell
+curl localhost:8080/foo
+```
 
 ## Without Docker
 You can generate a test sample generator from multiple schemas as once.  
