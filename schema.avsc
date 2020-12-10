@@ -29,12 +29,6 @@
             "type": "boolean"
         },
         {
-            "name": "imageData",
-            "type": ["null", "bytes"],
-            "default": null,
-            "doc": "The (optional) bytes of a person's avatar"
-        },
-        {
             "name": "location",
             "type": {
                 "type": "record",
