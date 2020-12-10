@@ -11,5 +11,5 @@ func Generate(recordName string, amount int) ([]interface{}, error) {
 	}
 }
 func GetRecordNames() []string {
-	return []string{"person"}
+	return []string{}
 }
