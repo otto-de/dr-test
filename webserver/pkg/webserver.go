@@ -17,22 +17,18 @@ type Webserver interface {
 }
 
 func populateRouter(webserver Webserver, router *mux.Router, recordName string) {
-	lowercased := strings.ToLower(recordName)
-	fmt.Println("Populating /" + lowercased)
-	router.HandleFunc("/"+lowercased, getHandler(webserver, recordName)).Methods("GET")
-}
-
-func getHandler(webserver Webserver, recordName string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+	lowerCased := strings.ToLower(recordName)
+	fmt.Println("Populating /" + lowerCased)
+	router.HandleFunc("/"+lowerCased, func(w http.ResponseWriter, r *http.Request) {
 		amount := 1 // TODO: use quantity from path var
-		entities, err := webserver.GenerateEntity(recordName, amount)
+		handlerResponse, err := getResponse(webserver, recordName, amount)
 
 		if err != nil {
 			fmt.Println("ERROR generating:", err)
 			os.Exit(1)
 		}
 
-		response, err := json.Marshal(entities)
+		response, err := json.Marshal(handlerResponse.Body)
 
 		if err != nil {
 			fmt.Println("MARSHAL ERROR", err)
@@ -43,7 +39,11 @@ func getHandler(webserver Webserver, recordName string) func(w http.ResponseWrit
 		if writeErr != nil {
 			fmt.Println("WRITE ERROR", writeErr)
 		}
-	}
+
+		for name, value := range handlerResponse.Headers {
+			w.Header().Set(name, value)
+		}
+	}).Methods("GET")
 }
 
 func Start(server Webserver, host string, port int) {
