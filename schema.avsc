@@ -1,0 +1,66 @@
+{
+    "namespace": "de.otto.dr.test",
+    "type": "record",
+    "name": "Person",
+    "doc": "A person",
+    "fields": [
+        {
+            "name": "name",
+            "type": "string",
+            "doc": "The name of the person"
+        },
+        {
+            "name": "age",
+            "type": "int",
+            "doc": "The person's age in years"
+        },
+        {
+            "name": "height",
+            "type": "float",
+            "doc": "The person's height in meters (attention it's a float)"
+        },
+        {
+            "name": "accountBalance",
+            "type": "long",
+            "doc": "The person's account balance in cent (positive or negative)"
+        },
+        {
+            "name": "isFemale",
+            "type": "boolean"
+        },
+        {
+            "name": "location",
+            "type": {
+                "type": "record",
+                "name": "location",
+                "fields": [
+                    {
+                        "name": "lat",
+                        "type": "double",
+                        "doc": "The latitude of the location"
+                    },
+                    {
+                        "name": "lon",
+                        "type": "double",
+                        "doc": "The longitude of the location"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "hobbies",
+            "type": {
+                "type": "array",
+                "items": "string"
+            },
+            "doc": "The person's hobbies"
+        },
+        {
+            "name" : "favourites",
+            "type" : {
+                "type" : "map",
+                "values" : "long"
+            }
+        }
+    ]
+}
