@@ -1,9 +1,18 @@
 #!/bin/bash
 
+print_usage () {
+  echo "usage: run.sh docker-image schemafiles..."
+  exit 1
+}
+
+if [ $# -eq 0 ];
+then
+  print_usage
+fi
+
 if [ "$1" = "--help" ];
 then
-  echo "usage: run.sh docker-image schemafiles..."
-  exit 0
+  print_usage
 fi
 
 SCHEMA_DIR=/opt/schemafiles
@@ -20,4 +29,4 @@ do
   VOLUMES+=" -v $schema_path:$SCHEMA_DIR/$schema_name"
 done
 
-docker run -it $VOLUMES "$DOCKER_IMAGE"
+docker run -p 8080:8080 -it $VOLUMES "$DOCKER_IMAGE"
