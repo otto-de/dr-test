@@ -8,7 +8,7 @@ on:
 
 env: 
   DOCKER_REGISTRY: registry.hub.docker.com
-  DOCKE_USERNAME: herzrasen
+  DOCKER_USERNAME: herzrasen
   DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
 jobs:
