@@ -8,6 +8,7 @@ on:
 
 env: 
   DOCKER_REGISTRY: registry.hub.docker.com
+  DOCKER_REPOSITORY: herzrasen
   DOCKER_USERNAME: herzrasen
   DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
@@ -52,7 +53,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          tags: ${{ env.DOCKER_REGISTRY }}/drtest:latest
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPOSITORY }}/drtest:latest
           load: true
       - name: Push image
-        run: docker push ${{ env.DOCKER_REGISTRY }}/drtest:latest
+        run: docker push ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPOSITORY }}/drtest:latest
