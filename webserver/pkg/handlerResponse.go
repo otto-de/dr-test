@@ -15,4 +15,3 @@ type HandlerResponse struct {
 	Body    interface{}
 	Headers map[string]string
 }
-

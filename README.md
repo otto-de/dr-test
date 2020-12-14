@@ -62,7 +62,7 @@ Make the randomizer configurable, such that
 can be configured to be used for each field name present in the schema.
 
 ### Multiple schemas in docker container
-- [ ] Implemented
+- [x] Implemented
 
 Either in ``docker build`` or ``docker run`` it should be possible to load multiple avro schemas at once.
 
