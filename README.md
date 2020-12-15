@@ -1,9 +1,20 @@
 # Dr. Test
 
 ## Installation
-Create the docker image using the following command:
+
+### Pull the image from DockerHub
+To pull the latest Docker image from DockerHub use the following command:
 
 ```shell
+docker pull drtesthelps/drtest:latest
+```
+
+### Local Docker build
+You can create the Docker image locally by using the following command:
+
+```shell
+git clone git@github.com:otto-de/dr-test.git
+cd dr-test
 docker build -t drtest .
 ```
 
@@ -39,10 +50,14 @@ You can also mount an entire local directory. `dr-test` will use all files with 
 
 The webserver starts on container port 8080 by default. You can overwrite it using docker's `-p` flag.
 
-Given your record's name is `Foo`, your test samples can be fetched via ``/foo``.
+Given your record's name is `Foo`, your test samples can be fetched via ``/foo`` or ``/foo/{amount}``.
 
 ```shell
 curl localhost:8080/foo
+```
+
+```shell
+curl localhost:8080/foo/100
 ```
 
 ## Without Docker
