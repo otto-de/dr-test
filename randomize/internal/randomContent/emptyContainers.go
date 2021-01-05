@@ -4,6 +4,7 @@ import (
 	"drtest/randomize/api"
 	"math/rand"
 	"reflect"
+	"time"
 )
 
 func EmptyMap(p reflect.Type, configuration api.Configuration) (reflect.Value, int) {
@@ -23,6 +24,8 @@ func getLen(minLen, maxLen int) int {
 	if maxLen <= 0 {
 		return 1
 	}
+	// Use the Seed function to initialize the default Source if different behavior is required for each run. (https://golang.org/pkg/math/rand/)
+	rand.Seed(time.Now().UnixNano())
 	proposed := rand.Intn(maxLen)
 	if proposed < minLen {
 		return minLen
