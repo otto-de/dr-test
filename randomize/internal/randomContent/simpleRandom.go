@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"reflect"
+	"time"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -22,11 +23,10 @@ func randomBool() bool {
 }
 
 func randomByte() byte {
-	if randomBool() {
-		return 0
-	} else {
-		return 1
-	}
+	rand.Seed(time.Now().UnixNano())
+	max := 255
+	val := rand.Intn(max + 1)
+	return uint8(val)
 }
 
 func RandomSimpleValue(typ reflect.Type, configuration api.Configuration) reflect.Value {

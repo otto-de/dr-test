@@ -42,7 +42,7 @@ func buildContainer(meta fieldextraction.FieldMeta, configuration api.Configurat
 func buildValue(fieldMeta fieldextraction.FieldMeta, configuration api.Configuration) reflect.Value {
 	typ := fieldMeta.ReflectionType()
 	switch typ.Kind() {
-	case reflect.Int32, reflect.Int64, reflect.Float32, reflect.Float64, reflect.String, reflect.Bool:
+	case reflect.Uint8, reflect.Int32, reflect.Int64, reflect.Float32, reflect.Float64, reflect.String, reflect.Bool:
 		return randomContent.RandomSimpleValue(typ, configuration)
 	case reflect.Ptr:
 		newStruct := reflect.New(fieldMeta.Value.Elem().Type())
@@ -74,7 +74,9 @@ func buildRandomMap(fieldMeta fieldextraction.FieldMeta, configuration api.Confi
 
 func buildRandomSlice(fieldMeta fieldextraction.FieldMeta, configuration api.Configuration) reflect.Value {
 	slice, size := randomContent.EmptySlice(fieldMeta.ReflectionType(), configuration)
-	slice = reflect.Append(slice, reflect.ValueOf(buildValue(fieldMeta, configuration).Interface()))
+	for i := 0; i < size; i++ {
+		slice = reflect.Append(slice, reflect.ValueOf(buildValue(fieldMeta, configuration).Interface()))
+	}
 	return slice.Slice(0, size)
 
 }

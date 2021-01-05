@@ -10,6 +10,16 @@ import (
 
 func TestRandomizeSimpleValues(t *testing.T) {
 
+	t.Run("randomize byte slice", func(t *testing.T) {
+		type ByteSliceStruct struct {
+			Slice []byte
+		}
+		got := randomizeWithDefaults(&ByteSliceStruct{})
+		assert.NotNil(t, got)
+		slice := getField(got, "Slice").Bytes()
+		assert.True(t, len(slice) > 0)
+	})
+
 	t.Run("randomize string", func(t *testing.T) {
 		type StringStruct struct {
 			String string
