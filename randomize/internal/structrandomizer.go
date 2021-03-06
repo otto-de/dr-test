@@ -26,7 +26,7 @@ func fillSimpleValue(strukt interface{}, fieldMeta fieldextraction.FieldMeta, co
 		if fieldMeta.IsContainer() {
 			f.Set(buildContainer(fieldMeta, configuration))
 		} else {
-			f.Set(buildValue(fieldMeta, configuration))
+			f.Set(buildValue(fieldMeta, configuration).Convert(fieldMeta.ReflectionType()))
 		}
 	}
 }
@@ -42,7 +42,7 @@ func buildContainer(meta fieldextraction.FieldMeta, configuration api.Configurat
 func buildValue(fieldMeta fieldextraction.FieldMeta, configuration api.Configuration) reflect.Value {
 	typ := fieldMeta.ReflectionType()
 	switch typ.Kind() {
-	case reflect.Uint8, reflect.Int32, reflect.Int64, reflect.Float32, reflect.Float64, reflect.String, reflect.Bool:
+	case reflect.Int, reflect.Uint8, reflect.Int32, reflect.Int64, reflect.Float32, reflect.Float64, reflect.String, reflect.Bool:
 		return randomContent.RandomSimpleValue(typ, configuration)
 	case reflect.Ptr:
 		newStruct := reflect.New(fieldMeta.Value.Elem().Type())
