@@ -30,7 +30,10 @@
         },
         {
             "name": "image",
-            "type": "bytes"
+            "type": [
+                "null",
+                "bytes"
+            ]
         },
         {
             "name": "location",

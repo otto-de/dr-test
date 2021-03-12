@@ -3,6 +3,7 @@ package internal
 import (
 	"drtest/randomize/api"
 	"fmt"
+	"github.com/actgardner/gogen-avro/v7/vm/types"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -17,6 +18,21 @@ func TestRandomizeSimpleValues(t *testing.T) {
 		got := randomizeWithDefaults(&ByteSliceStruct{})
 		assert.NotNil(t, got)
 		slice := getField(got, "Slice").Bytes()
+		assert.True(t, len(slice) > 0)
+	})
+
+	t.Run("randomize optional value", func(t *testing.T) {
+		type UnionNullBytesTypeEnum int
+
+		type UnionNullBytes struct {
+			Null      *types.NullVal
+			Bytes     []byte
+			UnionType UnionNullBytesTypeEnum
+		}
+
+		got := randomizeWithDefaults(&UnionNullBytes{})
+		assert.NotNil(t, got)
+		slice := getField(got, "Bytes").Bytes()
 		assert.True(t, len(slice) > 0)
 	})
 
